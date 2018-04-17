@@ -1,3 +1,6 @@
+## Coming soon ![TeamCity (simple build status)](https://img.shields.io/teamcity/http/teamcity.jetbrains.com/s/bt345.svg)  
+### This is a placeholder.  
+
 # miniRAT
 This is miniRAT, a small tool for maintain access after Hacking a system.  
 This tool is only for PenTest (Trust me!), please don't use it for illegal actions :)
@@ -10,7 +13,7 @@ Reconnect after a random pause.
 
 
 ## Quick Start
-start cmd
+start cmd  
 *miniRAT.exe* IP/Domain port
 
 
