@@ -6,14 +6,15 @@ This tool is only for PenTest (Trust me!), please don't use it for illegal actio
 
 ## Features
 Develop by C# in Visual studio 2017.  
+Silent  
 Work with IP or Domain.  
 Run CMD commands.  
 Reconnect after a random pause.  
 
 
 ## Quick Start
-start cmd  
-*miniRAT.exe* IP/Domain port
+Server side: *miniServer.exe port*    
+*miniRAT.exe IP/Domain port*
 
 
 ## ToDo
@@ -25,3 +26,5 @@ Upload file.
 Run binary in memory.  
 Encrypt data.  
 Linux support.  
+Proxy.  
+KeepAlive.  
