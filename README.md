@@ -14,7 +14,7 @@ Reconnect after a random pause.
 
 ## Quick Start
 Server side: *miniServer.exe port*    
-*miniRAT.exe IP/Domain port*
+Client side: *miniRAT.exe IP/Domain port*
 
 
 ## ToDo
