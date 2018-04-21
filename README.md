@@ -13,7 +13,7 @@ Reconnect after a random pause.
 
 
 ## Quick Start
-Server side: *miniServer.exe port*    
+Server side run: *miniServer.exe*    
 Client side: *miniRAT.exe IP/Domain port*
 
 
