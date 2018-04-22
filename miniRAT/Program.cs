@@ -9,12 +9,17 @@ namespace miniRAT
     {
         static void Main(string[] args)
         {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.BackgroundColor = ConsoleColor.White;
-            Console.WriteLine("Keep calm miniRAT starts");
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("miniRAT end");
-            Console.ReadKey();
+            Start.Intro();
+            if (Start.ParsInput(args) == false)
+            {
+                Console.WriteLine("Error in input args");
+                Environment.Exit(0);
+            }
+            if(Connector.ConnectToServer(args)==true)
+            {
+                Console.WriteLine("after connect is OK");
+            }
+            
         }
     }
 }

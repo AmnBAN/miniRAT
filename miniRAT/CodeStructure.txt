@@ -1,0 +1,14 @@
+﻿user run> miniRAT.exe ip|URL port
+display intro message()
+pars arguments()
+	if not OK exit
+	if OK continue
+create TCPclient from args and connect to server
+	if connect wait and run server commands
+	if not connect wait() then try again
+
+Connector class
+	resolve server domain to ip
+	connect to it
+
+
