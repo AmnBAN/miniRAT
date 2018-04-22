@@ -11,7 +11,7 @@ Develop by C# in Visual studio 2017.
 Silent  
 Work with IP or Domain.  
 Run CMD commands.  
-Reconnect after a random pause.  
+Reconnect after a additive random wait.  
 
 
 ## Quick Start
