@@ -1,7 +1,7 @@
 ## Coming soon ![TeamCity (simple build status)](https://img.shields.io/teamcity/http/teamcity.jetbrains.com/s/bt428.svg)  
 
 # miniRAT
-### Codename: Resident Evil
+### Codename: BatMAN begins
 This is miniRAT, a small tool for maintain access after Hacking a system.  
 This tool is only for PenTest (Trust me!), please don't use it for illegal actions :)  
 
