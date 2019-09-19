@@ -20,7 +20,7 @@ Server side run: *miniServer.exe*
 Client side: *miniRAT.exe IP/Domain port*
 
 
-## ToDo
+## ToDo:
 Internal proxy resolver.  
 Secondary Server address.  
 Update server address.  
