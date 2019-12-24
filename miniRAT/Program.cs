@@ -9,17 +9,20 @@ namespace miniRAT
     {
         static void Main(string[] args)
         {
+# if DEBUG
+            if (args.Length == 0)
+            {
+                args = new string[] { "127.0.0.1", "8080" };
+            }
+#endif
             Start.Intro();
             if (Start.ParsInput(args) == false)
             {
                 Console.WriteLine("Error in input args");
                 Environment.Exit(0);
             }
-            if(Connector.ConnectToServer(args)==true)
-            {
-                Console.WriteLine("after connect is OK");
-            }
-            
+
+            Connector.ConnectToServer(args);
         }
     }
 }

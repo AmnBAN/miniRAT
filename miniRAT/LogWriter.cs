@@ -12,7 +12,7 @@ namespace miniRAT
     {
         public static void WriteLog(string log)
         {
-            Console.WriteLine(log);
+            Console.WriteLine(DateTime.Now.ToString()+" "+ log);
         }
     }
 }

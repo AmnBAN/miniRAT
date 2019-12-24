@@ -256,7 +256,7 @@
             this.buttonStop.TabIndex = 8;
             this.buttonStop.Text = "Stop Server";
             this.buttonStop.UseVisualStyleBackColor = true;
-            this.buttonStop.Click += new System.EventHandler(this.ButtonStop_Click);
+            this.buttonStop.Click += new System.EventHandler(this.ButtonStop_Click );
             // 
             // ServerForm
             // 

