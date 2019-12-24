@@ -9,9 +9,9 @@ using System.Windows.Forms;
 
 namespace miniServer
 {
-    public partial class Form1 : Form
+    public partial class ServerForm : Form
     {
-        public Form1()
+        public ServerForm()
         {
             InitializeComponent();
         }
@@ -47,6 +47,11 @@ namespace miniServer
             {
                 e.Cancel = true;
             }
+        }
+
+        private void ButtonStart_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
