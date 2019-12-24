@@ -37,15 +37,28 @@
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.buttonStart = new System.Windows.Forms.Button();
-            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDownPort = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
+            this.richTextBoxLog = new System.Windows.Forms.RichTextBox();
+            this.dataGridViewClients = new System.Windows.Forms.DataGridView();
+            this.flag = new System.Windows.Forms.DataGridViewImageColumn();
+            this.id = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Note = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ip = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.os = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.version = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.live = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.buttonStop = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPort)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewClients)).BeginInit();
             this.SuspendLayout();
             // 
             // statusStrip1
             // 
-            this.statusStrip1.Location = new System.Drawing.Point(0, 356);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 532);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(853, 22);
             this.statusStrip1.TabIndex = 0;
@@ -101,16 +114,17 @@
             // 
             // groupBox2
             // 
-            this.groupBox2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.groupBox2.Location = new System.Drawing.Point(0, 65);
+            this.groupBox2.Controls.Add(this.dataGridViewClients);
+            this.groupBox2.Location = new System.Drawing.Point(0, 86);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(853, 291);
+            this.groupBox2.Size = new System.Drawing.Size(853, 183);
             this.groupBox2.TabIndex = 3;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Clients";
+            this.groupBox2.Text = "Client";
             // 
             // buttonStart
             // 
+            this.buttonStart.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
             this.buttonStart.Location = new System.Drawing.Point(182, 36);
             this.buttonStart.Name = "buttonStart";
             this.buttonStart.Size = new System.Drawing.Size(75, 23);
@@ -119,25 +133,25 @@
             this.buttonStart.UseVisualStyleBackColor = true;
             this.buttonStart.Click += new System.EventHandler(this.ButtonStart_Click);
             // 
-            // numericUpDown1
+            // numericUpDownPort
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(74, 39);
-            this.numericUpDown1.Maximum = new decimal(new int[] {
+            this.numericUpDownPort.Location = new System.Drawing.Point(74, 39);
+            this.numericUpDownPort.Maximum = new decimal(new int[] {
             65535,
             0,
             0,
             0});
-            this.numericUpDown1.Minimum = new decimal(new int[] {
+            this.numericUpDownPort.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(102, 20);
-            this.numericUpDown1.TabIndex = 5;
-            this.numericUpDown1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.numericUpDown1.Value = new decimal(new int[] {
-            1,
+            this.numericUpDownPort.Name = "numericUpDownPort";
+            this.numericUpDownPort.Size = new System.Drawing.Size(102, 20);
+            this.numericUpDownPort.TabIndex = 5;
+            this.numericUpDownPort.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.numericUpDownPort.Value = new decimal(new int[] {
+            8080,
             0,
             0,
             0});
@@ -151,14 +165,109 @@
             this.label1.TabIndex = 6;
             this.label1.Text = "Listen port";
             // 
+            // richTextBoxLog
+            // 
+            this.richTextBoxLog.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.richTextBoxLog.Location = new System.Drawing.Point(0, 302);
+            this.richTextBoxLog.Name = "richTextBoxLog";
+            this.richTextBoxLog.ReadOnly = true;
+            this.richTextBoxLog.Size = new System.Drawing.Size(853, 230);
+            this.richTextBoxLog.TabIndex = 7;
+            this.richTextBoxLog.Text = "";
+            // 
+            // dataGridViewClients
+            // 
+            this.dataGridViewClients.AllowUserToAddRows = false;
+            this.dataGridViewClients.AllowUserToDeleteRows = false;
+            this.dataGridViewClients.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewClients.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.flag,
+            this.id,
+            this.Note,
+            this.ip,
+            this.Column1,
+            this.os,
+            this.version,
+            this.live});
+            this.dataGridViewClients.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridViewClients.Location = new System.Drawing.Point(3, 16);
+            this.dataGridViewClients.Name = "dataGridViewClients";
+            this.dataGridViewClients.ReadOnly = true;
+            this.dataGridViewClients.Size = new System.Drawing.Size(847, 164);
+            this.dataGridViewClients.TabIndex = 8;
+            // 
+            // flag
+            // 
+            this.flag.HeaderText = "Flag";
+            this.flag.Name = "flag";
+            this.flag.ReadOnly = true;
+            this.flag.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.flag.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            // 
+            // id
+            // 
+            this.id.HeaderText = "id";
+            this.id.Name = "id";
+            this.id.ReadOnly = true;
+            // 
+            // Note
+            // 
+            this.Note.HeaderText = "Note";
+            this.Note.Name = "Note";
+            this.Note.ReadOnly = true;
+            // 
+            // ip
+            // 
+            this.ip.HeaderText = "IP";
+            this.ip.Name = "ip";
+            this.ip.ReadOnly = true;
+            // 
+            // Column1
+            // 
+            this.Column1.HeaderText = "Host Name";
+            this.Column1.Name = "Column1";
+            this.Column1.ReadOnly = true;
+            // 
+            // os
+            // 
+            this.os.HeaderText = "OS";
+            this.os.Name = "os";
+            this.os.ReadOnly = true;
+            // 
+            // version
+            // 
+            this.version.HeaderText = "Version";
+            this.version.Name = "version";
+            this.version.ReadOnly = true;
+            // 
+            // live
+            // 
+            this.live.HeaderText = "isLive";
+            this.live.Name = "live";
+            this.live.ReadOnly = true;
+            // 
+            // buttonStop
+            // 
+            this.buttonStop.Enabled = false;
+            this.buttonStop.ForeColor = System.Drawing.Color.Red;
+            this.buttonStop.Location = new System.Drawing.Point(276, 36);
+            this.buttonStop.Name = "buttonStop";
+            this.buttonStop.Size = new System.Drawing.Size(75, 23);
+            this.buttonStop.TabIndex = 8;
+            this.buttonStop.Text = "Stop Server";
+            this.buttonStop.UseVisualStyleBackColor = true;
+            this.buttonStop.Click += new System.EventHandler(this.ButtonStop_Click);
+            // 
             // ServerForm
             // 
             this.AcceptButton = this.buttonStart;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(853, 378);
+            this.ClientSize = new System.Drawing.Size(853, 554);
+            this.Controls.Add(this.buttonStop);
+            this.Controls.Add(this.richTextBoxLog);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.numericUpDown1);
+            this.Controls.Add(this.numericUpDownPort);
             this.Controls.Add(this.buttonStart);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.statusStrip1);
@@ -170,7 +279,9 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            this.groupBox2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPort)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewClients)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -186,9 +297,20 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.Button buttonStart;
-        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.NumericUpDown numericUpDownPort;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
+        private System.Windows.Forms.RichTextBox richTextBoxLog;
+        private System.Windows.Forms.DataGridView dataGridViewClients;
+        private System.Windows.Forms.DataGridViewImageColumn flag;
+        private System.Windows.Forms.DataGridViewTextBoxColumn id;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Note;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ip;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn os;
+        private System.Windows.Forms.DataGridViewTextBoxColumn version;
+        private System.Windows.Forms.DataGridViewTextBoxColumn live;
+        private System.Windows.Forms.Button buttonStop;
     }
 }
 
