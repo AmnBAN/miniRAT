@@ -20,7 +20,11 @@ namespace miniServer
 
         private void startToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            ButtonStart_Click(sender, e);
+        }
+        private void StopToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ButtonStop_Click(sender, e);
         }
 
         private void configToolStripMenuItem_Click(object sender, EventArgs e)
@@ -165,5 +169,7 @@ namespace miniServer
 
             writelog("Server Stopped.", null);
         }
+
+       
     }
 }
