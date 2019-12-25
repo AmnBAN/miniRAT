@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Threading;
 using System.IO;
@@ -97,7 +94,7 @@ namespace miniServer
                             //Decode recived data
                             string incomming = Encoding.UTF8.GetString(bytes);
 
-                            if (incomming == "isAlive")
+                            if (incomming == "IsServerAlive")
                                 SendToClient("IamAlive");
                             else
                                 Recivedata += incomming;

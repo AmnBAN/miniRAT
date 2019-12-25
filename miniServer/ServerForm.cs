@@ -9,6 +9,7 @@ namespace miniServer
 {
     public partial class ServerForm : Form
     {
+        //must be same in client and server
         const string separator = "|||";
         Thread serverThread;
         TcpListener serverTcp;
@@ -77,13 +78,10 @@ namespace miniServer
                         byte[] bytes = new byte[4096];
                         int byteread = stream.Read(bytes, 0, bytes.Length);
 
-                        //Decrypt received data
                         helloBytes = new byte[byteread];
                         Array.Copy(bytes, helloBytes, byteread);
 
-                        //TODO: Decrypt incomming
                         string incomming = Encoding.UTF8.GetString(helloBytes);
-
                         string[] stringSeparators = new string[] { separator };
                         string[] receive = incomming.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
                         //Recived: clientid<separator>osVersion<separator>clientversion<separator>HostName
@@ -101,13 +99,13 @@ namespace miniServer
                         else//incorect recive data
                         {
                             writelog(tcpClient.Client.RemoteEndPoint.ToString() + "Connection Hello is incorrect :( ",
-                                string.Format("Error Data={0}\nRecive Data={1} ", incomming, Encoding.ASCII.GetString(helloBytes, 0, byteread)));
+                                string.Format("Error Data={0}\nRecive Data={1} ", incomming, Encoding.UTF8.GetString(helloBytes, 0, byteread)));
                             return;
                         }
                     }
                     catch (Exception ex)
                     {
-                        writelog(tcpClient.Client.RemoteEndPoint.ToString() + " Error wile client connecting :( ", ex.Message + "\n" + Encoding.ASCII.GetString(helloBytes, 0, helloBytes.Length));
+                        writelog(tcpClient.Client.RemoteEndPoint.ToString() + " Error wile client connecting :( ", ex.Message + "\n" + Encoding.UTF8.GetString(helloBytes, 0, helloBytes.Length));
                         return;
                     }
                 }
