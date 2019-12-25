@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -14,7 +9,7 @@ namespace miniServer
 {
     public partial class ServerForm : Form
     {
-        const string seperator = "|||";
+        const string separator = "|||";
         Thread serverThread;
         TcpListener serverTcp;
 
@@ -85,9 +80,9 @@ namespace miniServer
                         //TODO: Decrypt incomming
                         string incomming = Encoding.UTF8.GetString(helloBytes);
 
-                        string[] stringSeparators = new string[] { seperator };
+                        string[] stringSeparators = new string[] { separator };
                         string[] receive = incomming.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
-                        //Recived: clientid|||osVersion|||clientversion|||HostName(optinal)
+                        //Recived: clientid<separator>osVersion<separator>clientversion<separator>HostName
                         if (receive.Length == 4)
                         {
                             int id = int.Parse(receive[0]);
@@ -123,7 +118,7 @@ namespace miniServer
             miniClient mc = new miniClient(1, tcpClient, os, version, hostName);
 
             //Hello is for future use
-            mc.SendToClient(mc.ID.ToString() + "|||" + "Hello");
+            mc.SendToClient(mc.ID.ToString() + separator + "Hello");
 
             //ADD new client to datagridview
             DataGridViewRow row = new DataGridViewRow();
