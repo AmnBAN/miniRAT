@@ -137,7 +137,7 @@ namespace miniServer
                 dataGridViewClients.Rows.Add(row);
             });
 
-            writelog(mc.IP + " -> Connected :)", mc.IP + " -> Connected :) :\n" + incomming);
+            writelog(mc.IP + " -> Connected :)", mc.IP + " -> Connected :) : " + incomming);
         }
 
         void writelog(string log, string extradata)
