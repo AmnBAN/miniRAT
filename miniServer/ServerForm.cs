@@ -9,7 +9,7 @@ namespace miniServer
 {
     public partial class ServerForm : Form
     {
-        //must be same in client and server
+        //must be same in client and server.
         const string separator = "|||";
         Thread serverThread;
         TcpListener serverTcp;
