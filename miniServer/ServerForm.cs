@@ -182,6 +182,35 @@ namespace miniServer
             writelog("Server Stopped.", null);
         }
 
+        private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //TODO: open interact form
+        }
 
+        private void EditNoteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //TODO: open edit note form
+        }
+
+        private void KillToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewClients.CurrentCell != null)
+            {
+                int i = (int)dataGridViewClients.CurrentRow.Cells[1].Value;//get id
+                if (clientList[i].IsAlive==false)
+                {
+                    MessageBox.Show("He is dead", "is dead", MessageBoxButtons.OK, MessageBoxIcon.Information) ;
+                    return;
+                }
+                
+                if (MessageBox.Show("Arey U sure to KILL Client process?", "Kill Client", MessageBoxButtons.YesNo, MessageBoxIcon.Hand) == DialogResult.Yes)
+                {
+                    //Quick and dirty way need to run in thread
+                    clientList[i].SendToClient("killyourself");
+                    clientList[i].IsAlive = false;
+                    dataGridViewClients.CurrentRow.Cells[7].Value = "False";//update data grid
+                }
+            }
+        }
     }
 }

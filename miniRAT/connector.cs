@@ -110,6 +110,7 @@ namespace miniRAT
                     throw new Exception("Error in hello response");
 
                 clientID = int.Parse(helloArray[0]);
+                Console.WriteLine("Connected to server id= " + clientID.ToString());
             }
             catch  (Exception ex)
             {
@@ -398,6 +399,7 @@ namespace miniRAT
                     case "clientpath":
                         return AppDomain.CurrentDomain.BaseDirectory + AppDomain.CurrentDomain.FriendlyName;
                     case "killyourself":
+                        Console.WriteLine("I must go. BYE");
                         Environment.Exit(0);
                         return "Error, I can't Kill my self !!!!";
                     case "givefile":
