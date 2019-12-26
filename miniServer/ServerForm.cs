@@ -39,7 +39,7 @@ namespace miniServer
 
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void ServerForm_Load(object sender, EventArgs e)
         {
 
         }
