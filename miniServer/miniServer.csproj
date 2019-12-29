@@ -55,6 +55,12 @@
       <DependentUpon>AboutBox1.cs</DependentUpon>
     </Compile>
     <Compile Include="Client.cs" />
+    <Compile Include="InteractForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InteractForm.Designer.cs">
+      <DependentUpon>InteractForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ServerForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -65,6 +71,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="AboutBox1.resx">
       <DependentUpon>AboutBox1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InteractForm.resx">
+      <DependentUpon>InteractForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ServerForm.resx">
       <DependentUpon>ServerForm.cs</DependentUpon>
