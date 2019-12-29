@@ -46,20 +46,21 @@
             this.os = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.version = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.live = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.contextMenuStripClients = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editNoteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.killToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.buttonStart = new System.Windows.Forms.Button();
             this.numericUpDownPort = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
             this.richTextBoxLog = new System.Windows.Forms.RichTextBox();
             this.buttonStop = new System.Windows.Forms.Button();
-            this.contextMenuStripClients = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.editNoteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.killToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.buttonRefreshClientList = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewClients)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPort)).BeginInit();
             this.contextMenuStripClients.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPort)).BeginInit();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -201,6 +202,36 @@
             this.live.Name = "live";
             this.live.ReadOnly = true;
             // 
+            // contextMenuStripClients
+            // 
+            this.contextMenuStripClients.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openToolStripMenuItem,
+            this.editNoteToolStripMenuItem,
+            this.killToolStripMenuItem});
+            this.contextMenuStripClients.Name = "contextMenuStripClients";
+            this.contextMenuStripClients.Size = new System.Drawing.Size(124, 70);
+            // 
+            // openToolStripMenuItem
+            // 
+            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(123, 22);
+            this.openToolStripMenuItem.Text = "&Open";
+            this.openToolStripMenuItem.Click += new System.EventHandler(this.OpenToolStripMenuItem_Click);
+            // 
+            // editNoteToolStripMenuItem
+            // 
+            this.editNoteToolStripMenuItem.Name = "editNoteToolStripMenuItem";
+            this.editNoteToolStripMenuItem.Size = new System.Drawing.Size(123, 22);
+            this.editNoteToolStripMenuItem.Text = "Edit &Note";
+            this.editNoteToolStripMenuItem.Click += new System.EventHandler(this.EditNoteToolStripMenuItem_Click);
+            // 
+            // killToolStripMenuItem
+            // 
+            this.killToolStripMenuItem.Name = "killToolStripMenuItem";
+            this.killToolStripMenuItem.Size = new System.Drawing.Size(123, 22);
+            this.killToolStripMenuItem.Text = "&Kill";
+            this.killToolStripMenuItem.Click += new System.EventHandler(this.KillToolStripMenuItem_Click);
+            // 
             // buttonStart
             // 
             this.buttonStart.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
@@ -266,35 +297,16 @@
             this.buttonStop.UseVisualStyleBackColor = true;
             this.buttonStop.Click += new System.EventHandler(this.ButtonStop_Click);
             // 
-            // contextMenuStripClients
+            // buttonRefreshClientList
             // 
-            this.contextMenuStripClients.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.openToolStripMenuItem,
-            this.editNoteToolStripMenuItem,
-            this.killToolStripMenuItem});
-            this.contextMenuStripClients.Name = "contextMenuStripClients";
-            this.contextMenuStripClients.Size = new System.Drawing.Size(181, 92);
-            // 
-            // openToolStripMenuItem
-            // 
-            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.openToolStripMenuItem.Text = "&Open";
-            this.openToolStripMenuItem.Click += new System.EventHandler(this.OpenToolStripMenuItem_Click);
-            // 
-            // editNoteToolStripMenuItem
-            // 
-            this.editNoteToolStripMenuItem.Name = "editNoteToolStripMenuItem";
-            this.editNoteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.editNoteToolStripMenuItem.Text = "Edit &Note";
-            this.editNoteToolStripMenuItem.Click += new System.EventHandler(this.EditNoteToolStripMenuItem_Click);
-            // 
-            // killToolStripMenuItem
-            // 
-            this.killToolStripMenuItem.Name = "killToolStripMenuItem";
-            this.killToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.killToolStripMenuItem.Text = "&Kill";
-            this.killToolStripMenuItem.Click += new System.EventHandler(this.KillToolStripMenuItem_Click);
+            this.buttonRefreshClientList.BackgroundImage = global::miniServer.Properties.Resources.refresh1;
+            this.buttonRefreshClientList.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.buttonRefreshClientList.Location = new System.Drawing.Point(770, 27);
+            this.buttonRefreshClientList.Name = "buttonRefreshClientList";
+            this.buttonRefreshClientList.Size = new System.Drawing.Size(71, 53);
+            this.buttonRefreshClientList.TabIndex = 9;
+            this.buttonRefreshClientList.UseVisualStyleBackColor = true;
+            this.buttonRefreshClientList.Click += new System.EventHandler(this.ButtonRefreshClientList_Click);
             // 
             // ServerForm
             // 
@@ -302,6 +314,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(853, 554);
+            this.Controls.Add(this.buttonRefreshClientList);
             this.Controls.Add(this.buttonStop);
             this.Controls.Add(this.richTextBoxLog);
             this.Controls.Add(this.label1);
@@ -319,8 +332,8 @@
             this.menuStrip1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewClients)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPort)).EndInit();
             this.contextMenuStripClients.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPort)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -354,6 +367,7 @@
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editNoteToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem killToolStripMenuItem;
+        private System.Windows.Forms.Button buttonRefreshClientList;
     }
 }
 

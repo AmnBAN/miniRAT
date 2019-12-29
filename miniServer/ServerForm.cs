@@ -93,14 +93,18 @@ namespace miniServer
                             string[] stringSeparators = new string[] { separator };
                             string[] receive = incomming.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
                             //Recived: clientid<separator>osVersion<separator>clientversion<separator>HostName
+                            //Recived[0] -> clientid
+                            //Recived[1] -> osVersion
+                            //Recived[2] -> clientversion
+                            //Recived[3] -> HostName
                             if (receive.Length == 4)
                             {
-                                int id = int.Parse(receive[0]);
-
-                                string hostName = receive[3];
+                                //int id = int.Parse(receive[0]);
+                                //string hostName = receive[3];
 
                                 //A new client
-                                AddNewClienet(tcpClient, receive[1], receive[2], receive[3], incomming, hostName);
+                                //AddNewClienet(tcpClient, receive[1], receive[2], receive[3], incomming, hostName);
+                                AddNewClienet(tcpClient, receive[1], receive[2], receive[3], incomming);
                                 return;
 
                             }
@@ -123,8 +127,7 @@ namespace miniServer
             serverThread.Start();
         }
 
-
-        void AddNewClienet(TcpClient tcpClient, string os, string version, string keyClient, string incomming, string hostName)
+        void AddNewClienet(TcpClient tcpClient, string os, string version, string hostName, string incomming)
         {
             idMutex.WaitOne();
             miniClient mc = new miniClient(clientList.Count, tcpClient, os, version, hostName);
@@ -153,23 +156,28 @@ namespace miniServer
                 dataGridViewClients.Rows.Add(row);
             });
             gridMutex.ReleaseMutex();
-            writelog(mc.IP + " -> Connected :)", mc.IP + " -> Connected :) : " + incomming);
+            writelog(mc.IP + " -> Connected :) : " + incomming, "");
         }
 
         void writelog(string log, string extradata)
         {
-            richTextBoxLog.Invoke((MethodInvoker)delegate
-            {
-                richTextBoxLog.Text += DateTime.Now.ToString() + " " + log + "\n";
-            });
+
 
             if (extradata == null)
-                return;
-
-            richTextBoxLog.Invoke((MethodInvoker)delegate
             {
-                richTextBoxLog.Text += DateTime.Now.ToString() + " " + log + "\n" + extradata + "\n";
-            });
+                richTextBoxLog.Invoke((MethodInvoker)delegate
+                {
+                    richTextBoxLog.Text += (DateTime.Now.ToString() + " " + log + "\n").Replace(separator, "_");
+                });
+                return;
+            }
+            else {
+                richTextBoxLog.Invoke((MethodInvoker)delegate
+                {
+                    richTextBoxLog.Text += (DateTime.Now.ToString() + " " + log + "\n" + extradata + "\n").Replace(separator, "_");
+                });
+            }
+
         }
 
         private void ButtonStop_Click(object sender, EventArgs e)
@@ -178,7 +186,6 @@ namespace miniServer
             buttonStop.Enabled = false;
             serverThread.Abort();
             serverTcp.Stop();
-
             writelog("Server Stopped.", null);
         }
 
@@ -197,18 +204,97 @@ namespace miniServer
             if (dataGridViewClients.CurrentCell != null)
             {
                 int i = (int)dataGridViewClients.CurrentRow.Cells[1].Value;//get id
-                if (clientList[i].IsAlive==false)
+                if (clientList[i].IsAlive == false)
                 {
-                    MessageBox.Show("He is dead", "is dead", MessageBoxButtons.OK, MessageBoxIcon.Information) ;
+                    MessageBox.Show("He is dead", "is dead", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
-                
-                if (MessageBox.Show("Arey U sure to KILL Client process?", "Kill Client", MessageBoxButtons.YesNo, MessageBoxIcon.Hand) == DialogResult.Yes)
+
+                if (MessageBox.Show("Are U sure to KILL Client process?", "Kill Client", MessageBoxButtons.YesNo, MessageBoxIcon.Hand) == DialogResult.Yes)
                 {
                     //Quick and dirty way need to run in thread
                     clientList[i].SendToClient("killyourself");
                     clientList[i].IsAlive = false;
                     dataGridViewClients.CurrentRow.Cells[7].Value = "False";//update data grid
+                }
+            }
+        }
+
+        private void ButtonRefreshClientList_Click(object sender, EventArgs e)
+        {
+            buttonRefreshClientList.Enabled = false;
+            buttonRefreshClientList.Text = "Wait";
+
+            Thread check = new Thread(() => checkLives());
+            check.IsBackground = true;
+            check.Start();
+        }
+
+        private void checkLives()
+        {
+            List<Thread> tArray = new List<Thread>();
+            foreach (miniClient mc in clientList)
+            {
+                Thread t = new Thread(() => checkClientIsAlive(mc));
+                t.IsBackground = true;
+                t.Start();
+                tArray.Add(t);
+            }
+            foreach (Thread t in tArray)
+            {
+                t.Join();
+            }
+
+            buttonRefreshClientList.Invoke((MethodInvoker)delegate
+            {
+                buttonRefreshClientList.Enabled = true;
+                buttonRefreshClientList.Text = "";
+            });
+
+
+        }
+
+        private void checkClientIsAlive(miniClient mc)
+        {
+            if (mc.client.Client.Connected && !mc.Interact)
+            {
+                try
+                {
+                    mc.Recivedata = "";
+
+                    //Write a command
+                    mc.SendToClient("version");
+
+                    //waiting 30 sec for the response to be prepared
+                    int wait = 0;
+                    while (wait < 30)
+                    {
+                        if (mc.Recivedata != "")
+                        {
+                            mc.Recivedata = "";
+                            return;
+                        }
+                        Thread.Sleep(1000);
+                        wait++;
+                    }
+                    throw new Exception(" Don't response to version command.");
+                }catch(Exception ex)
+                {
+                    mc.IsAlive = false;
+                    mc.client.Close();
+
+                    gridMutex.WaitOne();
+                    dataGridViewClients.Invoke((MethodInvoker)delegate
+                    {
+                        dataGridViewClients["live", mc.ID].Value = "NO";
+                    });
+                    gridMutex.ReleaseMutex();
+
+                    richTextBoxLog.Invoke((MethodInvoker)delegate
+                    {
+                        richTextBoxLog.Text += String.Format("Client {0}: {1}\n",
+                            mc.ID.ToString(), ex.Message);
+                    });
                 }
             }
         }

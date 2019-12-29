@@ -92,6 +92,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="batman_begins_folder_1.ico" />
+    <None Include="Resources\refresh1.png" />
+    <None Include="Resources\refresh.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

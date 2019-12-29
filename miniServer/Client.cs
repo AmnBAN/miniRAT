@@ -138,9 +138,18 @@ namespace miniServer
             CommandHistory += command + Environment.NewLine;
             UTF8Encoding UTFEncoder = new System.Text.UTF8Encoding();
             byte[] outStream = UTFEncoder.GetBytes(command);//Encode Message
-            NetworkStream clientStream = client.GetStream();
-            clientStream.Write(outStream, 0, outStream.Length);
-            clientStream.Flush();
+            
+            try
+            {
+                NetworkStream clientStream = client.GetStream();
+                clientStream.Write(outStream, 0, outStream.Length);
+                clientStream.Flush();
+            }
+            catch
+            {
+
+            }
+
         }
         /// <summary>
         /// Send Data like files to client.
