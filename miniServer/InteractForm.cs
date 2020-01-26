@@ -89,5 +89,10 @@ namespace miniServer
                 SendCommand("run" + separator + comboBoxRun.Text + separator + comboBoxParameters.Text);
                 
         }
+
+        private void InteractForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            mc.Interact = false;
+        }
     }
 }

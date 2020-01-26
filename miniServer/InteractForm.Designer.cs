@@ -242,6 +242,7 @@
             this.ForeColor = System.Drawing.Color.Lime;
             this.Name = "InteractForm";
             this.Text = "InteractForm";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.InteractForm_FormClosed);
             this.Load += new System.EventHandler(this.InteractForm_Load);
             this.groupBoxInfo.ResumeLayout(false);
             this.groupBoxInfo.PerformLayout();
