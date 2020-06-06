@@ -36,10 +36,8 @@
             this.groupBoxResults = new System.Windows.Forms.GroupBox();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.groupBoxCommands = new System.Windows.Forms.GroupBox();
-            this.buttonRunPowerShell = new System.Windows.Forms.Button();
             this.ButtonRun = new System.Windows.Forms.Button();
             this.labelParameters = new System.Windows.Forms.Label();
-            this.comboBox3 = new System.Windows.Forms.ComboBox();
             this.comboBoxParameters = new System.Windows.Forms.ComboBox();
             this.comboBoxRun = new System.Windows.Forms.ComboBox();
             this.labelExePass = new System.Windows.Forms.Label();
@@ -110,43 +108,32 @@
             // richTextBox1
             // 
             this.richTextBox1.BackColor = System.Drawing.Color.Black;
-            this.richTextBox1.ForeColor = System.Drawing.Color.Black;
+            this.richTextBox1.ForeColor = System.Drawing.Color.Yellow;
             this.richTextBox1.Location = new System.Drawing.Point(22, 81);
             this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.ReadOnly = true;
             this.richTextBox1.Size = new System.Drawing.Size(579, 205);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
             // 
             // groupBoxCommands
             // 
-            this.groupBoxCommands.Controls.Add(this.buttonRunPowerShell);
             this.groupBoxCommands.Controls.Add(this.ButtonRun);
             this.groupBoxCommands.Controls.Add(this.labelParameters);
-            this.groupBoxCommands.Controls.Add(this.comboBox3);
             this.groupBoxCommands.Controls.Add(this.comboBoxParameters);
             this.groupBoxCommands.Controls.Add(this.comboBoxRun);
             this.groupBoxCommands.Controls.Add(this.labelExePass);
+            this.groupBoxCommands.Cursor = System.Windows.Forms.Cursors.Default;
             this.groupBoxCommands.Location = new System.Drawing.Point(19, 299);
             this.groupBoxCommands.Name = "groupBoxCommands";
             this.groupBoxCommands.Size = new System.Drawing.Size(579, 122);
             this.groupBoxCommands.TabIndex = 2;
             this.groupBoxCommands.TabStop = false;
             this.groupBoxCommands.Text = "Commands:";
-            this.groupBoxCommands.UseWaitCursor = true;
-            // 
-            // buttonRunPowerShell
-            // 
-            this.buttonRunPowerShell.ForeColor = System.Drawing.Color.Black;
-            this.buttonRunPowerShell.Location = new System.Drawing.Point(459, 78);
-            this.buttonRunPowerShell.Name = "buttonRunPowerShell";
-            this.buttonRunPowerShell.Size = new System.Drawing.Size(97, 23);
-            this.buttonRunPowerShell.TabIndex = 6;
-            this.buttonRunPowerShell.Text = "Run PowerShell";
-            this.buttonRunPowerShell.UseVisualStyleBackColor = true;
-            this.buttonRunPowerShell.UseWaitCursor = true;
             // 
             // ButtonRun
             // 
+            this.ButtonRun.Cursor = System.Windows.Forms.Cursors.WaitCursor;
             this.ButtonRun.ForeColor = System.Drawing.Color.Black;
             this.ButtonRun.Location = new System.Drawing.Point(459, 38);
             this.ButtonRun.Name = "ButtonRun";
@@ -154,7 +141,6 @@
             this.ButtonRun.TabIndex = 5;
             this.ButtonRun.Text = "Run";
             this.ButtonRun.UseVisualStyleBackColor = true;
-            this.ButtonRun.UseWaitCursor = true;
             this.ButtonRun.Click += new System.EventHandler(this.ButtonRun_Click);
             // 
             // labelParameters
@@ -168,23 +154,9 @@
             this.labelParameters.Text = "Parameters:";
             this.labelParameters.UseWaitCursor = true;
             // 
-            // comboBox3
-            // 
-            this.comboBox3.FormattingEnabled = true;
-            this.comboBox3.Items.AddRange(new object[] {
-            "Get-ChildItem",
-            "ls -recurse",
-            "Copy-Item src.txt dst.txt",
-            "Get-Location"});
-            this.comboBox3.Location = new System.Drawing.Point(11, 78);
-            this.comboBox3.Name = "comboBox3";
-            this.comboBox3.Size = new System.Drawing.Size(432, 21);
-            this.comboBox3.TabIndex = 3;
-            this.comboBox3.Text = "Get-Location";
-            this.comboBox3.UseWaitCursor = true;
-            // 
             // comboBoxParameters
             // 
+            this.comboBoxParameters.Cursor = System.Windows.Forms.Cursors.Default;
             this.comboBoxParameters.FormattingEnabled = true;
             this.comboBoxParameters.Items.AddRange(new object[] {
             "cd",
@@ -203,10 +175,10 @@
             this.comboBoxParameters.Size = new System.Drawing.Size(305, 21);
             this.comboBoxParameters.TabIndex = 2;
             this.comboBoxParameters.Text = "dir";
-            this.comboBoxParameters.UseWaitCursor = true;
             // 
             // comboBoxRun
             // 
+            this.comboBoxRun.Cursor = System.Windows.Forms.Cursors.WaitCursor;
             this.comboBoxRun.FormattingEnabled = true;
             this.comboBoxRun.Items.AddRange(new object[] {
             "cmd.exe",
@@ -217,7 +189,6 @@
             this.comboBoxRun.Size = new System.Drawing.Size(121, 21);
             this.comboBoxRun.TabIndex = 1;
             this.comboBoxRun.Text = "cmd.exe";
-            this.comboBoxRun.UseWaitCursor = true;
             // 
             // labelExePass
             // 
@@ -263,11 +234,9 @@
         private System.Windows.Forms.RichTextBox richTextBox1;
         private System.Windows.Forms.GroupBox groupBoxCommands;
         private System.Windows.Forms.Label labelParameters;
-        private System.Windows.Forms.ComboBox comboBox3;
         private System.Windows.Forms.ComboBox comboBoxParameters;
         private System.Windows.Forms.ComboBox comboBoxRun;
         private System.Windows.Forms.Label labelExePass;
-        private System.Windows.Forms.Button buttonRunPowerShell;
         private System.Windows.Forms.Button ButtonRun;
     }
 }

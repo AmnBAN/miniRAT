@@ -98,6 +98,8 @@ namespace miniServer
                                 SendToClient("IamAlive");
                             else
                                 Recivedata += incomming;
+                            
+                            
                         }
                     }
                 }
