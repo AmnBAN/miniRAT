@@ -11,7 +11,7 @@ namespace miniServer
         /// <summary>
         /// Unique ID of client
         /// </summary>
-        public int ID { get; }
+        public Guid ID { get; }
         public TcpClient client { get; private set; }
         public string IP { get; }
         public string Port { get; }
@@ -32,7 +32,7 @@ namespace miniServer
         /// <param name="_client">Client connection object</param>
         /// <param name="_os">OS name and version</param>
         /// <param name="_version">Version of client that installed on victim</param>
-        public miniClient(int _id, TcpClient _client, string _os, string clientVersion, string hostName = null)
+        public miniClient(Guid _id, TcpClient _client, string _os, string clientVersion, string hostName = null)
         {
             ID = _id;
             client = _client;

