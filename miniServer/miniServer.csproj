@@ -62,8 +62,8 @@
     <Compile Include="editNoteForm.Designer.cs">
       <DependentUpon>editNoteForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GeoIP\GeoInformation.cs" />
     <Compile Include="GeoIP\GeoLocationHelper.cs" />
+    <Compile Include="GeoIP\GetInformation.cs" />
     <Compile Include="InteractForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -83,6 +83,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="editNoteForm.resx">
       <DependentUpon>editNoteForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="InteractForm.resx">
       <DependentUpon>InteractForm.cs</DependentUpon>
