@@ -70,6 +70,7 @@
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.buttonSave);
             this.Controls.Add(this.buttonCancel);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.HelpButton = true;
             this.Name = "editNoteForm";
             this.ShowIcon = false;
