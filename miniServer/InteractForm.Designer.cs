@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(InteractForm));
             this.groupBoxInfo = new System.Windows.Forms.GroupBox();
             this.labelPort = new System.Windows.Forms.Label();
             this.labelIP = new System.Windows.Forms.Label();
@@ -180,7 +181,7 @@
             // 
             // comboBoxRun
             // 
-            this.comboBoxRun.Cursor = System.Windows.Forms.Cursors.WaitCursor;
+            this.comboBoxRun.Cursor = System.Windows.Forms.Cursors.Default;
             this.comboBoxRun.FormattingEnabled = true;
             this.comboBoxRun.Items.AddRange(new object[] {
             "cmd.exe",
@@ -218,6 +219,7 @@
             this.Controls.Add(this.groupBoxResults);
             this.Controls.Add(this.groupBoxInfo);
             this.ForeColor = System.Drawing.Color.Lime;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "InteractForm";
             this.Text = "InteractForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.InteractForm_FormClosed);
