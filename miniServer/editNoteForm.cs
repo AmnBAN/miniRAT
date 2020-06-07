@@ -12,21 +12,21 @@ namespace miniServer
 {
     public partial class editNoteForm : Form
     {
-        public string note { get; private set; }
+        public string note { get;private set; }
         public editNoteForm(string currentNote)
         {
             InitializeComponent();
-            note = textBox1.Text = currentNote;
+            note=textBox1.Text = currentNote;
         }
 
-        private void buttonCancel_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void buttonSave_Click(object sender, EventArgs e)
+        private void ButtonSave_Click(object sender, EventArgs e)
         {
             note = textBox1.Text;
+            Close();
+        }
+
+        private void ButtonCancel_Click(object sender, EventArgs e)
+        {
             this.Close();
         }
     }
