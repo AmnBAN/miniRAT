@@ -192,6 +192,10 @@ namespace miniRAT
                     clientStream.Flush();
                     sent = true;
                 }
+                catch
+                {
+
+                }
                 finally { sendMutex.ReleaseMutex(); }
             }
         }
@@ -339,6 +343,12 @@ namespace miniRAT
                 SendData("IsServerAlive");
 
                 int microSecondsTimeOut = 30000000;//30 secound
+#if DEBUG
+
+                    microSecondsTimeOut = 10000000;//60 secound
+                
+#endif
+
                 if (clientSocket.Client.Poll(microSecondsTimeOut, SelectMode.SelectRead) == true)//wait for data
                 {
                     if (clientSocket.Available == 0)

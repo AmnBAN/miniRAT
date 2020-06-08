@@ -123,7 +123,7 @@ namespace miniServer
         /// </summary>
         /// <param name="newTcpClient">New tcp client</param>
         /// <param name="newKey">New AES key</param>
-        public void RenewConnection(TcpClient newTcpClient, string newKey)
+        public void RenewConnection(TcpClient newTcpClient)
         {
             Disconnect();
             client = newTcpClient;
