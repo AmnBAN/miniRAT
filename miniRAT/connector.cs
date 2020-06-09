@@ -16,7 +16,8 @@ namespace miniRAT
     {
         //must be same in client and server
         const string separator = "|||";
-        static Guid clientID = Guid.Parse(ConfigurationManager.AppSettings["GUIDKEY"] ?? Guid.Empty.ToString());
+
+        static Guid clientID = string.IsNullOrEmpty(ConfigurationManager.AppSettings["GUIDKEY"])? Guid.Empty:Guid.Parse(ConfigurationManager.AppSettings["GUIDKEY"]);
         static TcpClient tcpClient;
         private static Mutex sendMutex = new Mutex();
 
@@ -109,8 +110,15 @@ namespace miniRAT
                 string[] helloArray = helloResponse.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
                 if (helloArray.Length < 2)//error in hello response 
                     throw new Exception("Error in hello response");
+
                 clientID = Guid.Parse(helloArray[0].ToString());
-                ConfigurationManager.AppSettings.Set("GUIDKEY", clientID.ToString());
+
+                // set client key give from server in first time connected and set to appsetting to use it in next connectin to the server
+                Configuration configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                configuration.AppSettings.Settings["GUIDKEY"].Value = clientID.ToString();
+                configuration.Save(ConfigurationSaveMode.Modified);
+                ConfigurationManager.RefreshSection("appSettings");
+
                 Console.WriteLine("Connected to server id= " + clientID.ToString());
             }
             catch  (Exception ex)
@@ -119,7 +127,6 @@ namespace miniRAT
             }
             return clientSocket;
         }
-        
         /// <summary>
         /// Send data to server
         /// </summary>
