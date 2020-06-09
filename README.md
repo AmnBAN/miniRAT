@@ -1,6 +1,16 @@
 ## Coming soon ![TeamCity (simple build status)](https://img.shields.io/teamcity/http/teamcity.jetbrains.com/s/bt428.svg)  
 
 # miniRAT
+## DISCLAIMER
+This tool is intended to be used in a legal and legitimate way only:
+
+either on your own systems as a means of learning, of demonstrating what can be done and how, or testing your defense and detection mechanisms
+on systems you've been officially and legitimately entitled to perform some security assessments (pentest, security audits)
+
+## Quoting Empire's authors
+
+There is no way to build offensive tools useful to the legitimate infosec industry while simultaneously preventing malicious actors from abusing them.
+
 ### Codename: BatMAN begins
 This is miniRAT, a small tool for maintain access after Hacking a system.  
 This tool is only for PenTest (Trust me!), please don't use it for illegal actions :)  
