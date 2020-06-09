@@ -133,11 +133,16 @@ namespace miniServer
 
         void AddNewClienet(TcpClient tcpClient, string os, string version, string hostName, string incomming)
         {
-            miniClient mc = clientList?.Where(e => e.ID.ToString() == incomming.Split(new string[] { separator }, StringSplitOptions.None)[0].ToString()).FirstOrDefault();
+            string ClientIdString= incomming.Split(new string[] { separator }, StringSplitOptions.None)[0];
+            miniClient mc = clientList?.Where(e => e.ID.ToString() == ClientIdString.ToString()).FirstOrDefault();
             idMutex.WaitOne();
             if (mc == null)
             {
-                mc = new miniClient(Guid.NewGuid(), tcpClient, os, version, hostName);
+                Guid Id ;
+                bool _isValidClientId = Guid.TryParse(ClientIdString,out Id);
+                if (!_isValidClientId)
+                    Id = Guid.NewGuid();
+                mc = new miniClient(Id, tcpClient, os, version, hostName);
                 clientList.Add(mc);
                 //idMutex.ReleaseMutex();
             }
