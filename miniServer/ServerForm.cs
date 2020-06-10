@@ -133,14 +133,14 @@ namespace miniServer
 
         void AddNewClienet(TcpClient tcpClient, string os, string version, string hostName, string incomming)
         {
-            string ClientIdString= incomming.Split(new string[] { separator }, StringSplitOptions.None)[0];
+            string ClientIdString = incomming.Split(new string[] { separator }, StringSplitOptions.None)[0];
             miniClient mc = clientList?.Where(e => e.ID.ToString() == ClientIdString.ToString()).FirstOrDefault();
             idMutex.WaitOne();
             if (mc == null)
             {
-                Guid Id ;
-                bool _isValidClientId = Guid.TryParse(ClientIdString,out Id);
-                if (!_isValidClientId || Id==Guid.Empty)
+                Guid Id;
+                bool _isValidClientId = Guid.TryParse(ClientIdString, out Id);
+                if (!_isValidClientId || Id == Guid.Empty)
                     Id = Guid.NewGuid();
                 mc = new miniClient(Id, tcpClient, os, version, hostName);
                 clientList.Add(mc);
@@ -148,14 +148,14 @@ namespace miniServer
             }
             else
             {
-                mc.RenewConnection(tcpClient);
+                mc.RenewConnection(tcpClient, mc.IsAlive);// when this connection is new client with same guid key then kill exist client and renew it
             }
 
             idMutex.ReleaseMutex();
             //Hello is for future use
             mc.SendToClient(mc.ID.ToString() + separator + "Hello");
 
-            string ConnectionStatus=string.Empty;
+            string ConnectionStatus = string.Empty;
             gridMutex.WaitOne();
             dataGridViewClients.Invoke((MethodInvoker)delegate
             {
@@ -193,7 +193,7 @@ namespace miniServer
 
 
             gridMutex.ReleaseMutex();
-            writelog(mc.IP + " -> "+ConnectionStatus+" :) : " + incomming.Replace(incomming.Split(new string[] { separator }, StringSplitOptions.None)[0], mc.ID.ToString()), "");
+            writelog(mc.IP + " -> " + ConnectionStatus + " :) : " + incomming.Replace(incomming.Split(new string[] { separator }, StringSplitOptions.None)[0], mc.ID.ToString()), "");
         }
 
         void writelog(string log, string extradata)

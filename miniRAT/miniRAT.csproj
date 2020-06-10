@@ -56,8 +56,8 @@
     <Compile Include="Start.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="batman-multi-size-red--p.ico" />
     <Content Include="batman-multi-size-red.ico" />
-    <Content Include="batman-multi-size.ico" />
     <Content Include="CodeStructure.txt" />
   </ItemGroup>
   <ItemGroup>

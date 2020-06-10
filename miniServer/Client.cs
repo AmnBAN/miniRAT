@@ -117,14 +117,19 @@ namespace miniServer
         {
             thread.Abort();
             client.Close();
+            IsAlive = false;
         }
         /// <summary>
         /// Stop old listen, close connection, clear recive data, change tcp client and crypto key, start new listen
         /// </summary>
         /// <param name="newTcpClient">New tcp client</param>
         /// <param name="newKey">New AES key</param>
-        public void RenewConnection(TcpClient newTcpClient)
+        public void RenewConnection(TcpClient newTcpClient,bool Kill)
         {
+            if (Kill)
+            {
+                this.SendToClient("killyourself");
+            }
             Disconnect();
             client = newTcpClient;
             Recivedata = "";
