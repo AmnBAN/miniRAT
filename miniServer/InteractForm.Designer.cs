@@ -185,8 +185,9 @@
             this.comboBoxRun.FormattingEnabled = true;
             this.comboBoxRun.Items.AddRange(new object[] {
             "cmd.exe",
-            "nc.exe",
-            "nc64.exe"});
+                //"nc.exe",
+                //"nc64.exe"
+            });
             this.comboBoxRun.Location = new System.Drawing.Point(11, 38);
             this.comboBoxRun.Name = "comboBoxRun";
             this.comboBoxRun.Size = new System.Drawing.Size(121, 21);
