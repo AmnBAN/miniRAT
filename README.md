@@ -36,7 +36,7 @@ This tool is intended to be used in a legal and legitimate way only:
 either on your own systems as a means of learning, of demonstrating what can be done and how, or testing your defense and detection mechanisms
 on systems you've been officially and legitimately entitled to perform some security assessments (pentest, security audits)
 
-Quoting Empire's authors
+~Quoting Empire's authors
 
 There is no way to build offensive tools useful to the legitimate infosec industry while simultaneously preventing malicious actors from abusing them.
 
