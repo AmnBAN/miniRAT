@@ -111,7 +111,10 @@ namespace miniServer
             catch (Exception x)
             { Recivedata += x.Message; }
             finally
-            { clientStream.Close(); }
+            {
+                clientStream.Close();
+                thread.Abort();
+            }
         }
 
         /// <summary>
@@ -120,7 +123,7 @@ namespace miniServer
         public void Disconnect()
         {
             client.Close();
-            thread.Abort();
+            //thread.Abort();
             IsAlive = false;
         }
         /// <summary>
