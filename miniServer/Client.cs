@@ -104,16 +104,11 @@ namespace miniServer
                     }
                 }
             }
-            catch(ThreadAbortException tex) // this exeption raise on new session created in client and server kill her client and thread (RenewConnection)
-            {
-                Recivedata += "client is duplicated and server kill previus client session and update client connection for new session";
-            }
             catch (Exception x)
             { Recivedata += x.Message; }
             finally
             {
                 clientStream.Close();
-                thread.Abort();
             }
         }
 
@@ -123,8 +118,8 @@ namespace miniServer
         public void Disconnect()
         {
             client.Close();
-            //thread.Abort();
             IsAlive = false;
+            thread.Abort();
         }
         /// <summary>
         /// Stop old listen, close connection, clear recive data, change tcp client and crypto key, start new listen
