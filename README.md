@@ -6,12 +6,11 @@ This tool is only for PenTest (Trust me!), please don't use it for illegal actio
 The main goal of developing miniRAT is create a lightweight reverse connection to server for running commands, normal tools like plink or other rats are so noisy, if the server don't response to them they try to make many connection and send many SYN packets that IDS can  easily detect them, but miniRAT wait for a random additive increase time for create new connection (additive wait). In other tools you can't change server address easily but in miniRAT you can add secondary (Secondary address). [this features not implement yet :(]
 
 ## Features
-Develop with C# in Visual studio 2017.  
 Silent  
 Work with IP or Domain.  
 Run CMD commands.  
 Reconnect after a additive random wait.  
-
+Develop with C# in Visual studio 2019.
 
 ## Quick Start
 Server side run: *miniServer.exe*    
