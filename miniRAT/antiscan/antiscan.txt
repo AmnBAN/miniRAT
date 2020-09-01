@@ -1,0 +1,40 @@
+image link :
+https://antiscan.me/images/result/BmJplkWNbx85.png
+
+result link :
+https://antiscan.me/scan/new/result?id=BmJplkWNbx85
+
+plain text result :
+File Name: miniRAT.exe
+Scan Date: 01-09-2020 08:12:22
+Detected by: 0/26
+
+MD5: cc51ff721a0c4cad8b895d23068a3679
+Checked by AntiScan.Me: https://antiscan.me/scan/new/result?id=BmJplkWNbx85
+
+adaware:Clean
+ahnlab:Clean
+alyac:Clean
+avast:Clean
+avg:Clean
+avira:Clean
+bitdef:Clean
+bullguard:Clean
+clam:Clean
+comodo:Clean
+drweb:Clean
+emsisoft:Clean
+nod32:Clean
+fortinet:Clean
+fsec:Clean
+ikarus:Clean
+kasper:Clean
+mcafeetp:Clean
+mbytes:Clean
+pandagp:Clean
+sophos:Clean
+trend:Clean
+webroot:Clean
+mssec:Clean
+zonealarm:Clean
+zillya:Clean			
